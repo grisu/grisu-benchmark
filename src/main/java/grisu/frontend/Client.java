@@ -2,6 +2,8 @@ package grisu.frontend;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.JobPropertiesException;
 import grisu.control.exceptions.JobSubmissionException;
@@ -60,9 +62,16 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 		Boolean mpi = getCliParameters().getMpi();
 		Boolean single = getCliParameters().getSingle();
 
+		if(script==null)
+		{
+			System.err.println("Please specify the script name");
+			System.exit(1);
+		}
+		
 		if(group==null)
 		{
-			group = "/nz/nesi";
+			System.err.println("Please specify a group name");
+			System.exit(1);
 		}
 
 		//		if(files==null)
@@ -72,10 +81,16 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 			cpu="1";
 
 		if(jobName==null)
-			jobName="cat_job";
+		{
+			System.err.println("Please specify a job name");
+			System.exit(1);
+		}
 
 		if(wallTime==0)
-			wallTime=60;
+			{
+			System.err.println("Please specify wall time");
+			System.exit(1);
+			}
 
 		if(mpi && single)
 		{
@@ -124,10 +139,13 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 
 			System.out.println("jobtype: mpi-"+job.isForce_mpi()+" single-"+job.isForce_single());
 
-			if(queue!=null)
+			if(StringUtils.isBlank(queue)) 
 			{
-				job.addJobProperty("queue", queue);
+				System.err.println("No queue specified.");
+				System.exit(1);
 			}
+				job.setSubmissionLocation(queue);
+			
 
 			if(cpuSplit[i].contains("=")){
 				temp=cpuSplit[i].split("=");
