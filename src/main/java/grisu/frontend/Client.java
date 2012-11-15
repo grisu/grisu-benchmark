@@ -47,22 +47,41 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 	@Override
 	public void run() {
 
-		String file = getCliParameters().getFile();
+		String script = getCliParameters().getScript();
+		String scriptName=FileManager.getFilename(script);
 		String cpu = getCliParameters().getCpu();
 		String group = getCliParameters().getGroup();
 		String queue = getCliParameters().getQueue();
 		String files = getCliParameters().getFiles();
+
+		//merging older changes
+		int wallTime = getCliParameters().getWallTime();
+		String jobName = getCliParameters().getJobName();
+		Boolean mpi = getCliParameters().getMpi();
+		Boolean single = getCliParameters().getSingle();
 
 		if(group==null)
 		{
 			group = "/nz/nesi";
 		}
 
-		if(files==null)
-			files=file;
+		//		if(files==null)
+		//			files=file;
 
 		if(cpu==null)
 			cpu="1";
+
+		if(jobName==null)
+			jobName="cat_job";
+
+		if(wallTime==0)
+			wallTime=60;
+
+		if(mpi && single)
+		{
+			System.err.println("Cannot set job type to both mpi and single");
+			System.exit(1);
+		}
 
 
 		String[] cpuSplit=cpu.split(",");
@@ -70,92 +89,103 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 		String[] filename;// = FileManager.getFilename(file);
 		for(int i=0;i<cpuSplit.length;i++)
 		{
-			filename=files.split(",");
-			for(int j=0; j<filename.length; j++)
+
+			//			for(int j=0; j<filename.length; j++)
+			//			{
+			//				// all login stuff is implemented in the parent class
+			System.out.println("Getting serviceinterface...");
+			ServiceInterface si = null;
+			try {
+				si = getServiceInterface();
+			} catch (Exception e) {
+				System.err.println("Could not login: " + e.getLocalizedMessage());
+				System.exit(1);
+			}
+
+			System.out.println("Creating job...");
+			JobObject job = new JobObject(si);
+
+			System.out.println("File to use for the job: " + script);
+
+			job.setApplication(Constants.GENERIC_APPLICATION_NAME);
+			job.setCommandline("sh " + scriptName);
+			job.addInputFileUrl(script);
+			if(files!=null){
+				filename=files.split(",");
+				for(int j=0; j<filename.length; j++)
+				{
+					job.addInputFileUrl(filename[j]);
+				}
+			}
+			job.setWalltimeInSeconds(wallTime);
+			job.setForce_mpi(mpi);
+			job.setForce_single(single);
+			job.setTimestampJobname(jobName);
+
+			System.out.println("jobtype: mpi-"+job.isForce_mpi()+" single-"+job.isForce_single());
+
+			if(queue!=null)
 			{
-				// all login stuff is implemented in the parent class
-				System.out.println("Getting serviceinterface...");
-				ServiceInterface si = null;
-				try {
-					si = getServiceInterface();
-				} catch (Exception e) {
-					System.err.println("Could not login: " + e.getLocalizedMessage());
-					System.exit(1);
-				}
-				
-				System.out.println("Creating job...");
-				JobObject job = new JobObject(si);
+				job.addJobProperty("queue", queue);
+			}
 
-				System.out.println("File to use for the job: " + filename);
-				
-				job.setApplication(Constants.GENERIC_APPLICATION_NAME);
-				job.setCommandline("cat " + filename[j]);
-				job.addInputFileUrl(filename[j]);
-				job.setWalltimeInSeconds(60);
-				job.setTimestampJobname("cat_job");
+			if(cpuSplit[i].contains("=")){
+				temp=cpuSplit[i].split("=");
+				job.setCpus(Integer.parseInt(temp[0]));
+				job.setHostCount(Integer.parseInt(temp[1]));
+			}
+			else
+			{
+				job.setCpus(Integer.parseInt(cpuSplit[i]));
+			}
 
-				if(queue!=null)
-				{
-					job.addJobProperty("queue", queue);
-				}
+			System.out.println("Set jobname to be: " + job.getJobname());
 
-				if(cpuSplit[i].contains("=")){
-					temp=cpuSplit[i].split("=");
-					job.setCpus(Integer.parseInt(temp[0]));
-					job.setHostCount(Integer.parseInt(temp[1]));
-				}
-				else
-				{
-					job.setCpus(Integer.parseInt(cpuSplit[i]));
-				}
+			try {
+				System.out.println("Creating job on backend...");
+				job.createJob(group);
+			} catch (JobPropertiesException e) {
+				System.err.println("Could not create job: "
+						+ e.getLocalizedMessage());
+				System.exit(1);
+			}
 
-				System.out.println("Set jobname to be: " + job.getJobname());
-
-				try {
-					System.out.println("Creating job on backend...");
-					job.createJob(group);
-				} catch (JobPropertiesException e) {
-					System.err.println("Could not create job: "
-							+ e.getLocalizedMessage());
-					System.exit(1);
-				}
-
-				try {
-					System.out.println("Submitting job to the grid...");
-					job.submitJob();
-				} catch (JobSubmissionException e) {
-					System.err.println("Could not submit job: "
-							+ e.getLocalizedMessage());
-					System.exit(1);
-				} catch (InterruptedException e) {
-					System.err.println("Jobsubmission interrupted: "
-							+ e.getLocalizedMessage());
-					System.exit(1);
-				}
+			try {
+				System.out.println("Submitting job to the grid...");
+				job.submitJob();
+			} catch (JobSubmissionException e) {
+				System.err.println("Could not submit job: "
+						+ e.getLocalizedMessage());
+				System.exit(1);
+			} catch (InterruptedException e) {
+				System.err.println("Jobsubmission interrupted: "
+						+ e.getLocalizedMessage());
+				System.exit(1);
+			}
 
 			//	Map jmap=job.getAllJobProperties();
-				System.out.println("Job submitted to queue: "+job.getJobProperty("queue"));
-				System.out.println("Job submission finished.");
-				System.out.println("Job submitted to: "
-						+ job.getJobProperty(Constants.SUBMISSION_SITE_KEY));
+			System.out.println("Job submitted to queue: "+job.getJobProperty("queue"));
+			System.out.println("Job submission finished.");
+			System.out.println("Job submitted to: "
+					+ job.getJobProperty(Constants.SUBMISSION_SITE_KEY));
 
-				System.out.println("cpu-"+job.getCpus());
-				System.out.println("host-"+job.getHostCount());
+			System.out.println("cpu-"+job.getCpus());
+			System.out.println("host-"+job.getHostCount());
 
-//				System.out.println("Waiting for job to finish...");
-//
-//				// for a realy workflow, don't check every 5 seconds since that would
-//				// put too much load on the backend/gateways
-//				job.waitForJobToFinish(5);
-//
-//				System.out.println("Job finished with status: "
-//						+ job.getStatusString(false));
-//
-//				System.out.println("Stdout: " + job.getStdOutContent());
-//				System.out.println("Stderr: " + job.getStdErrContent());
+			//				System.out.println("Waiting for job to finish...");
+			//
+			//				// for a realy workflow, don't check every 5 seconds since that would
+			//				// put too much load on the backend/gateways
+			//				job.waitForJobToFinish(5);
+			//
+			//				System.out.println("Job finished with status: "
+			//						+ job.getStatusString(false));
+			//
+			//				System.out.println("Stdout: " + job.getStdOutContent());
+			//				System.out.println("Stderr: " + job.getStdErrContent());
 
 
-			}
+			//}
 		}
 
 		/***
