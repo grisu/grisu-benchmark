@@ -1,6 +1,6 @@
 #!/usr/bin/env bash 
 
-echo "Started: `date`" >> benchmark.log
+echo "Started: `date +%s`" >> benchmark.log
 
 echo "Cat'ting input file:"
 
@@ -12,4 +12,4 @@ sleep 30
 
 echo "Slept well."
 
-echo "Finished: `date`" >> benchmark.log
+echo "Finished: `date +%s`" >> benchmark.log
