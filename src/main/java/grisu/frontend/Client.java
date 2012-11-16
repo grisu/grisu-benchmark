@@ -1,10 +1,5 @@
 package grisu.frontend;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.JobPropertiesException;
 import grisu.control.exceptions.JobSubmissionException;
@@ -12,7 +7,12 @@ import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobObject;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.constants.Constants;
+import grisu.jcommons.utils.WalltimeUtils;
 import grisu.model.FileManager;
+
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 public class Client extends GrisuCliClient<ExampleCliParameters> {
 
@@ -104,6 +104,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 		String[] cpuSplit=cpu.split(",");
 		String[] temp = new String[3];
 		String[] filename;// = FileManager.getFilename(file);
+		int index;
 		for(int i=0;i<cpuSplit.length;i++)
 		{
 
@@ -154,7 +155,21 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 			if(cpuSplit[i].contains("=")){
 				temp=cpuSplit[i].split("=");
 				job.setCpus(Integer.parseInt(temp[0]));
+				if(temp[1].contains("["))
+				{
+					index= temp[1].indexOf("[");
+					temp[0]=temp[1].substring(index+1, temp[1].length()-1);
+					temp[1]=temp[1].substring(0, index);
+					try {
+						job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(temp[0]));
+					} catch (Exception e) {
+						System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string"); 
+						e.printStackTrace();
+					}
+//					int wt = WalltimeUtils.
+				}
 				job.setHostCount(Integer.parseInt(temp[1]));
+				
 			}
 			else
 			{
@@ -166,7 +181,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 				temp=new String[3];
 				for(int k=0;k<envVarList.size();k++){
 					temp[0]=envVarList.get(k);
-					int index=temp[0].indexOf("=");
+					index=temp[0].indexOf("=");
 					temp[1]=temp[0].substring(0,index);
 					temp[2]=temp[0].substring(index+1, temp[0].length());
 					job.addEnvironmentVariable(temp[1], temp[2]);
