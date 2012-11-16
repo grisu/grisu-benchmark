@@ -69,7 +69,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 			System.err.println("Please specify the script name");
 			System.exit(1);
 		}
-		
+
 		if(group==null)
 		{
 			System.err.println("Please specify a group name");
@@ -89,10 +89,10 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 		}
 
 		if(wallTime==0)
-			{
+		{
 			System.err.println("Please specify wall time");
 			System.exit(1);
-			}
+		}
 
 		if(mpi && single)
 		{
@@ -149,33 +149,51 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 				System.err.println("No queue specified.");
 				System.exit(1);
 			}
-				job.setSubmissionLocation(queue);
-			
+			job.setSubmissionLocation(queue);
 
-			if(cpuSplit[i].contains("=")){
-				temp=cpuSplit[i].split("=");
-				job.setCpus(Integer.parseInt(temp[0]));
-				if(temp[1].contains("["))
-				{
-					index= temp[1].indexOf("[");
-					temp[0]=temp[1].substring(index+1, temp[1].length()-1);
-					temp[1]=temp[1].substring(0, index);
+
+			//if(cpuSplit[i].contains("=")){
+			temp=cpuSplit[i].split("=");
+			String holder;
+			if(temp[0].contains("["))
+			{
+				index= temp[0].indexOf("[");
+				holder=temp[0].substring(index+1, temp[0].length()-1);
+				temp[0]=temp[0].substring(0, index);
+				try {
+					job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(holder));
+				} catch (Exception e) {
+					System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string"); 
+					e.printStackTrace();
+				}
+
+			}
+			job.setCpus(Integer.parseInt(temp[0]));
+			if(temp.length>1)
+				//if(temp[1].contains("["))
+			{
+				temp[0]=temp[1];
+				index= temp[0].indexOf("[");
+				if(index!=-1){
+					temp[1]=temp[0].substring(index+1, temp[0].length()-1);
+					temp[0]=temp[0].substring(0, index);
 					try {
-						job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(temp[0]));
+						job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(temp[1]));
 					} catch (Exception e) {
 						System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string"); 
 						e.printStackTrace();
 					}
-//					int wt = WalltimeUtils.
 				}
-				job.setHostCount(Integer.parseInt(temp[1]));
-				
+				//					int wt = WalltimeUtils.
+				job.setHostCount(Integer.parseInt(temp[0]));
 			}
-			else
-			{
-				job.setCpus(Integer.parseInt(cpuSplit[i]));
-			}
-			
+
+			//}
+			//			else
+			//		{
+			//		job.setCpus(Integer.parseInt(cpuSplit[i]));
+			//}
+
 			if(envVarList!=null)
 			{
 				temp=new String[3];
