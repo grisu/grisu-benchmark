@@ -1,5 +1,7 @@
 package grisu.frontend;
 
+import java.util.List;
+
 import grisu.frontend.view.cli.GrisuCliParameters;
 
 import com.beust.jcommander.Parameter;
@@ -76,6 +78,14 @@ public class ExampleCliParameters extends GrisuCliParameters {
 	public String getFiles(){
 		return files;
 	}		
+	
+	//Benchmark changes
+	@Parameter(names = {"--env"}, description = "the environment variables for the job")
+	private List<String> envVars;
+
+	public List<String> getEnvVars(){
+		return envVars;
+	}			
 
 
 }

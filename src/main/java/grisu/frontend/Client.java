@@ -1,5 +1,6 @@
 package grisu.frontend;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +56,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 		String group = getCliParameters().getGroup();
 		String queue = getCliParameters().getQueue();
 		String files = getCliParameters().getFiles();
+		List<String> envVarList=getCliParameters().getEnvVars();
 
 		//merging older changes
 		int wallTime = getCliParameters().getWallTime();
@@ -155,6 +157,14 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 			else
 			{
 				job.setCpus(Integer.parseInt(cpuSplit[i]));
+			}
+			
+			if(envVarList!=null)
+			{
+				for(int k=0;k<envVarList.size();k++){
+					temp=envVarList.get(k).split("=");
+					job.addEnvironmentVariable(temp[0], temp[1]);
+				}
 			}
 
 			System.out.println("Set jobname to be: " + job.getJobname());
