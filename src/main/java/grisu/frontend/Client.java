@@ -102,7 +102,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 
 
 		String[] cpuSplit=cpu.split(",");
-		String[] temp;
+		String[] temp = new String[3];
 		String[] filename;// = FileManager.getFilename(file);
 		for(int i=0;i<cpuSplit.length;i++)
 		{
@@ -135,8 +135,10 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 				}
 			}
 			job.setWalltimeInSeconds(wallTime);
-			job.setForce_mpi(mpi);
-			job.setForce_single(single);
+			if(mpi!=null)
+				job.setForce_mpi(mpi);
+			if(single!=null)
+				job.setForce_single(single);
 			job.setTimestampJobname(jobName);
 
 			System.out.println("jobtype: mpi-"+job.isForce_mpi()+" single-"+job.isForce_single());
@@ -161,9 +163,13 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 			
 			if(envVarList!=null)
 			{
+				temp=new String[3];
 				for(int k=0;k<envVarList.size();k++){
-					temp=envVarList.get(k).split("=");
-					job.addEnvironmentVariable(temp[0], temp[1]);
+					temp[0]=envVarList.get(k);
+					int index=temp[0].indexOf("=");
+					temp[1]=temp[0].substring(0,index);
+					temp[2]=temp[0].substring(index+1, temp[0].length());
+					job.addEnvironmentVariable(temp[1], temp[2]);
 				}
 			}
 
