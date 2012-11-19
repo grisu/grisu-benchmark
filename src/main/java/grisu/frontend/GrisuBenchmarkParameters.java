@@ -6,7 +6,7 @@ import grisu.frontend.view.cli.GrisuCliParameters;
 
 import com.beust.jcommander.Parameter;
 
-public class ExampleCliParameters extends GrisuCliParameters {
+public class GrisuBenchmarkParameters extends GrisuCliParameters {
 
 
 	@Parameter(names = { "--mpi"}, description = "sets the job type to be mpi")

@@ -14,5 +14,11 @@ public class ClientResultsParams extends GrisuCliParameters {
 	public String getJobName(){
 		return jobName;
 	}
+	
+	@Parameter(names = { "--no-wait"}, description = "don't wait for all jobs to finish")
+	private boolean nowait = true;
+	public Boolean getNowait() {
+		return nowait;
+	}
 
 }

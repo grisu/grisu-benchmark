@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-public class Client extends GrisuCliClient<ExampleCliParameters> {
+public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 
 	public static void main(String[] args) {
 
@@ -23,7 +23,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 
 		// helps to parse commandline arguments, if you don't want to create
 		// your own parameter class, just use DefaultCliParameters
-		ExampleCliParameters params = new ExampleCliParameters();
+		GrisuBenchmarkParameters params = new GrisuBenchmarkParameters();
 		// create the client
 		Client client = null;
 		try {
@@ -43,7 +43,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 
 	}
 
-	public Client(ExampleCliParameters params, String[] args) throws Exception {
+	public Client(GrisuBenchmarkParameters params, String[] args) throws Exception {
 		super(params, args);
 	}
 

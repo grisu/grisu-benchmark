@@ -1,41 +1,30 @@
 package grisu.frontend;
 
+import grisu.control.ServiceInterface;
+import grisu.control.exceptions.NoSuchJobException;
+import grisu.frontend.control.login.LoginManager;
+import grisu.frontend.model.job.JobObject;
+import grisu.frontend.view.cli.GrisuCliClient;
+import grisu.model.FileManager;
+import grisu.model.GrisuRegistryManager;
+import grisu.model.UserEnvironmentManager;
+import grisu.model.dto.DtoJob;
+
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
-
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
-import grisu.control.ServiceInterface;
-import grisu.control.exceptions.JobPropertiesException;
-import grisu.control.exceptions.JobSubmissionException;
-import grisu.control.exceptions.NoSuchJobException;
-import grisu.frontend.control.login.LoginManager;
-import grisu.frontend.model.job.JobException;
-import grisu.frontend.model.job.JobObject;
-import grisu.frontend.view.cli.GrisuCliClient;
-import grisu.jcommons.constants.Constants;
-import grisu.model.FileManager;
-import grisu.model.GrisuRegistryManager;
-import grisu.model.UserEnvironmentManager;
-import grisu.model.dto.DtoJob;
-
-public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
+public class ClientResults extends GrisuCliClient<ClientResultsParams> {
+	
+	private static final int waittime = 10;
 
 	public static void main(String[] args) {
 
@@ -44,7 +33,7 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 
 		// helps to parse commandline arguments, if you don't want to create
 		// your own parameter class, just use DefaultCliParameters
-		ExampleCliParameters params = new ExampleCliParameters();
+		ClientResultsParams params = new ClientResultsParams();
 		// create the client
 		ClientResults client = null;
 		try {
@@ -64,7 +53,7 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 
 	}
 
-	public ClientResults(ExampleCliParameters params, String[] args) throws Exception {
+	public ClientResults(ClientResultsParams params, String[] args) throws Exception {
 		super(params, args);
 	}
 
@@ -72,6 +61,9 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 	public void run() {
 
 		String jobname = getCliParameters().getJobName();
+		
+		boolean nowait = getCliParameters().getNowait();
+				
 
 		CSVWriter writer = null;
 		String[] csvTemp = new String[10];
@@ -141,17 +133,23 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 			flag=false;
 			for(String jname:currentJobList)
 			{
+				
 				if(jname.contains(jobname)){
+					System.out.println("Checking job: "+jname);
 					try 
 					{
 						JobObject job = new JobObject(si, jname);
 
 						if(!job.isFinished())
 						{
-							flag=true;
+							System.out.println("\tNot finished.");
+							if ( !nowait) {
+								flag=true;
+							}
 						}
 						else
 						{
+							System.out.println("\tFinished.");
 							if(!downloadStatus.contains(job))
 							{
 								temp=Integer.parseInt(job.getCpus().toString());
@@ -169,8 +167,16 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 					}
 
 				}
-
+				
 			}
+			// wait a few seconds, so we don't overload the backend
+			if ( flag ) {
+				try {
+					Thread.sleep(waittime*1000);
+				} catch (InterruptedException e) {
+				}
+			}
+
 		}
 		System.out.println("minimum no. of CPUs: "+minCpu);
 		System.out.println("minimum wall time: "+minCpuWallTime);
