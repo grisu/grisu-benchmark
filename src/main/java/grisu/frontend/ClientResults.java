@@ -88,14 +88,14 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				"\ngoogle.setOnLoadCallback(drawChart);"+
 				"\nfunction drawChart() {"+
 				"\nvar data = google.visualization.arrayToDataTable(["+
-				"\n['Number of CPUs', 'Total Execution time for the job', 'Execution Time per CPU (ms)', 'Efficiency']");
+				"\n['Number of CPUs', 'Execution time for the job', 'Total Execution Time across all CPUs', 'Efficiency']");
 
 		StringBuffer tableString=new StringBuffer("<table border=\"1\">"+
 				"<tr>"+
 				"<th>Job name</th>"+
 				"<th>Number of CPUs</th>"+
-				"<th>Total Execution time for the job (ms)</th>"+
-				"<th>Execution time per CPU</th>"+
+				"<th>Execution time for the job</th>"+
+				"<th>Total Execution time across all CPUs</th>"+
 				"<th>Efficiency</th>"+
 				"</tr>");
 
@@ -235,7 +235,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				holder=jobLog.substring(jobLog.lastIndexOf("Finished:"));
 				Long long2=Long.parseLong(holder.substring(10,holder.indexOf("\n")));
 
-				System.out.println("Time taken for execution:"+(long2-long1) +"ms");
+				System.out.println("Time taken for execution:"+(long2-long1));
 				valuesForJob[5]=""+(long2-long1);
 				totalExecTime=(long2-long1);
 				Long totalAllCpus = totalExecTime * cpus;
