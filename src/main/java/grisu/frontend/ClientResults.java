@@ -234,14 +234,13 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 
 				writer.writeNext(csvTemp);
 				htmlString.append(",\n['"+temp+"', "+totalExecTime+", "+Double.parseDouble(csvTemp[6])+", "+Double.parseDouble(csvTemp[7])+"]");
-				tableString.append("<tr><td>"+csvTemp[0]+"</td><td>"+temp+"</td><td>"+totalExecTime+"</td><td>"+trimDouble(Double.parseDouble(csvTemp[6]))+"</td><td> "+trimDouble(Double.parseDouble(csvTemp[7]))+"</td></tr>");
+				tableString.append("<tr><td>"+csvTemp[0]+"</td><td align=\"right\">"+temp+"</td><td align=\"right\">"+totalExecTime+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(csvTemp[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(csvTemp[7]))+"</td></tr>");
 
 			}
 			catch(Exception e)
 			{
 				System.out.println("job failed");
 			}
-
 		}
 
 		//		csvTemp[0]="Total number of CPUs="+cpuCount;
@@ -278,20 +277,18 @@ public class ClientResults extends GrisuCliClient<ExampleCliParameters> {
 			//Close the output stream
 			out.close();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
 		try {
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	double trimDouble(double d) {
-        DecimalFormat df = new DecimalFormat("#.##");
-    return Double.valueOf(df.format(d));
-}
+		DecimalFormat df = new DecimalFormat("#.##");
+		return Double.valueOf(df.format(d));
+	}
 }
