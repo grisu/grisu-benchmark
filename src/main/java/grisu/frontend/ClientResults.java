@@ -60,12 +60,18 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 	@Override
 	public void run() {
 
-		String jobname = getCliParameters().getJobName();
-		
+		String jobname = getCliParameters().getJobName();		
 		boolean nowait = getCliParameters().getNowait();
+		
+		if(jobname==null)
+		{
+			System.err.println("Please specify a job name");
+			System.exit(1);
+		}
 				
 
 		CSVWriter writer = null;
+		CSVWriter errWriter = null;
 		String[] csvTemp = new String[10];
 
 		csvTemp[0]="Job name";
@@ -99,7 +105,10 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 		try {
 			writer = new CSVWriter(new FileWriter(jobname+".csv"));
+			errWriter = new CSVWriter(new FileWriter(jobname+"_err.csv"));
 			writer.writeNext(csvTemp);
+			csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
+			errWriter.writeNext(csvTemp);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -246,6 +255,8 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			catch(Exception e)
 			{
 				System.out.println("job failed");
+				csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
+				errWriter.writeNext(csvTemp);
 			}
 		}
 
@@ -288,6 +299,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 		try {
 			writer.close();
+			errWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
