@@ -57,6 +57,8 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 		String queue = getCliParameters().getQueue();
 		String files = getCliParameters().getFiles();
 		List<String> envVarList=getCliParameters().getEnvVars();
+		
+		
 
 		//merging older changes
 		int wallTime = getCliParameters().getWallTime();
@@ -100,6 +102,11 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 			System.exit(1);
 		}
 
+		if(queue==null) 
+		{
+			System.err.println("No queue specified.");
+			System.exit(1);
+		}
 
 		String[] cpuSplit=cpu.split(",");
 		String[] temp = new String[3];
@@ -144,11 +151,6 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 
 			System.out.println("jobtype: mpi-"+job.isForce_mpi()+" single-"+job.isForce_single());
 
-			if(StringUtils.isBlank(queue)) 
-			{
-				System.err.println("No queue specified.");
-				System.exit(1);
-			}
 			job.setSubmissionLocation(queue);
 
 
@@ -164,7 +166,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 					job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(holder));
 				} catch (Exception e) {
 					System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string"); 
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 
 			}
@@ -181,7 +183,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 						job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(temp[1]));
 					} catch (Exception e) {
 						System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string"); 
-						e.printStackTrace();
+					//	e.printStackTrace();
 					}
 				}
 				//					int wt = WalltimeUtils.
