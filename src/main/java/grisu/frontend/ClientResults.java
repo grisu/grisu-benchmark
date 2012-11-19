@@ -77,7 +77,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		csvTemp[3]="CPUs";
 		csvTemp[4]="Wall time";
 		csvTemp[5]="Job execution time";
-		csvTemp[6]="Average execution time per CPU";
+		csvTemp[6]="Execution time across all CPUs";
 		csvTemp[7]="Efficiency";
 
 		StringBuffer htmlString=new StringBuffer("<html>"+
