@@ -20,9 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 
-import com.beust.jcommander.internal.Lists;
-
 import au.com.bytecode.opencsv.CSVWriter;
+
+import com.google.common.collect.Lists;
 
 public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 	
@@ -68,16 +68,17 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				
 
 		CSVWriter writer = null;
-		String[] valueNames = new String[10];
+		CSVWriter errWriter = null;
+		String[] csvTemp = new String[10];
 
-		valueNames[0]="Job name";
-		valueNames[1]="Host count";
-		valueNames[2]="Job success status";
-		valueNames[3]="CPUs";
-		valueNames[4]="Wall time";
-		valueNames[5]="Job execution time";
-		valueNames[6]="Average execution time per CPU";
-		valueNames[7]="Efficiency";
+		csvTemp[0]="Job name";
+		csvTemp[1]="Host count";
+		csvTemp[2]="Job success status";
+		csvTemp[3]="CPUs";
+		csvTemp[4]="Wall time";
+		csvTemp[5]="Job execution time";
+		csvTemp[6]="Average execution time per CPU";
+		csvTemp[7]="Efficiency";
 
 		StringBuffer htmlString=new StringBuffer("<html>"+
 				"\n<head>"+
@@ -87,21 +88,24 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				"\ngoogle.setOnLoadCallback(drawChart);"+
 				"\nfunction drawChart() {"+
 				"\nvar data = google.visualization.arrayToDataTable(["+
-				"\n['Number of CPUs', 'Total Execution time for the job', 'Execution Time across all CPUs (ms)', 'Efficiency']");
+				"\n['Number of CPUs', 'Total Execution time for the job', 'Execution Time per CPU (ms)', 'Efficiency']");
 
 		StringBuffer tableString=new StringBuffer("<table border=\"1\">"+
 				"<tr>"+
 				"<th>Job name</th>"+
 				"<th>Number of CPUs</th>"+
-				"<th>Execution time for the job (ms)</th>"+
-				"<th>Total Execution time across all CPUs</th>"+
+				"<th>Total Execution time for the job (ms)</th>"+
+				"<th>Execution time per CPU</th>"+
 				"<th>Efficiency</th>"+
 				"</tr>");
 
 
 		try {
 			writer = new CSVWriter(new FileWriter(jobname+".csv"));
-			writer.writeNext(valueNames);
+			errWriter = new CSVWriter(new FileWriter(jobname+"_err.csv"));
+			writer.writeNext(csvTemp);
+			csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
+			errWriter.writeNext(csvTemp);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -173,8 +177,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			}
 
 		}
-//		System.out.println("minimum no. of CPUs: "+minCpu);
-//		System.out.println("minimum wall time: "+minCpuWallTime);
+
 
 		Collections.sort(downloadStatus, new Comparator<JobObject>(){
 			public int compare(JobObject j1, JobObject j2)
