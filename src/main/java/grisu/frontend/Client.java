@@ -140,7 +140,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 				job.setForce_mpi(mpi);
 			if(single!=null)
 				job.setForce_single(single);
-			job.setTimestampJobname(jobName);
+			
 
 			System.out.println("jobtype: mpi-"+job.isForce_mpi()+" single-"+job.isForce_single());
 
@@ -206,6 +206,7 @@ public class Client extends GrisuCliClient<ExampleCliParameters> {
 				}
 			}
 
+			job.setTimestampJobname(jobName+"_"+job.getCpus()+"_cpus");
 			System.out.println("Set jobname to be: " + job.getJobname());
 
 			try {
