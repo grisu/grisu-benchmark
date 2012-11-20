@@ -79,13 +79,10 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			System.exit(1);
 		}		
 
-		FileManager fm = GrisuRegistryManager.getDefault(si).getFileManager();
 		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si).getUserEnvironmentManager();
-		SortedSet<DtoJob> currentJobs = uem.getCurrentJobs(true);
 		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);	
 
-		//JobObject job; 
-
+	    //if --list option is specified
 		if(list)
 		{
 			String jnConst="";
@@ -128,11 +125,12 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			System.exit(0);
 		}
 
-		CSVWriter writer = null;
+
+		//for --jobname option 
 		CSVWriter errWriter = null;
 		String[] csvTemp = new String[10];
 
-		//csvTemp[0]="Job name";
+		csvTemp[0]="Job name";
 		csvTemp[1]="Host count";
 		csvTemp[2]="Job success status";
 		csvTemp[3]="CPUs";
@@ -141,72 +139,31 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		csvTemp[6]="Execution time across all CPUs";
 		csvTemp[7]="Efficiency";
 
-		StringBuffer htmlString=new StringBuffer("<html>"+
-				"\n<head>"+
-				"\n<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"+
-				"\n<script type=\"text/javascript\">"+
-				"\ngoogle.load(\"visualization\", \"1\", {packages:[\"corechart\"]});"+
-				"\ngoogle.setOnLoadCallback(drawChart);"+
-				"\nfunction drawChart() {"+
-				"\nvar data = google.visualization.arrayToDataTable(["+
-				"\n['Number of CPUs', 'Execution time for the job', 'Total Execution Time across all CPUs']");
-
-		StringBuffer tableString=new StringBuffer("<table border=\"1\">"+
-				"<tr>"+
-//				"<th>Job name</th>"+
-				"<th>Number of CPUs</th>"+
-				"<th>Execution time for the job</th>"+
-				"<th>Total Execution time across all CPUs</th>"+
-				"<th>Efficiency</th>"+
-				"</tr>");
-
-		StringBuffer effGraphString=new StringBuffer("\nvar effdata = google.visualization.arrayToDataTable(["+
-				"\n['Number of CPUs', 'Efficiency']");
-
 		try {
-			writer = new CSVWriter(new FileWriter(jobname+".csv"));
 			errWriter = new CSVWriter(new FileWriter(jobname+"_err.csv"));
-			writer.writeNext(csvTemp);
 			csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
-			csvTemp[0]="Job name";
 			errWriter.writeNext(csvTemp);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-
-		//
-		//		System.out.println("Getting serviceinterface...");
-		//		ServiceInterface si = null;
-		//		try {
-		//			si = getServiceInterface();
-		//		} catch (Exception e) {
-		//			System.err.println("Could not login: " + e.getLocalizedMessage());
-		//			System.exit(1);
-		//		}
-
-		//		FileManager fm = GrisuRegistryManager.getDefault(si).getFileManager();
-		//		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si).getUserEnvironmentManager();
-		//		SortedSet<DtoJob> currentJobs = uem.getCurrentJobs(true);
-		//		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
 		Boolean flag=true;
 		List<JobObject> downloadStatus=new ArrayList<JobObject>();
-		int cpuCount=0;
 		Long totalExecTime=0L;
 		jobname=jobname+"_";
+		List<String[]> allJobs = Lists.newArrayList();
+		Integer minCpu=9999;
+		Long minCpuWallTime=0L;
 		while(flag)
 		{
 			flag=false;
 			for(String jname:currentJobList)
 			{
-
 				if(jname.contains(jobname)){
 					System.out.println("Checking job: "+jname);
 					try 
 					{
 						JobObject job = new JobObject(si, jname);
-
 						if(!job.isFinished())
 						{
 							System.out.println("\tNot finished.");
@@ -219,7 +176,49 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 							System.out.println("\tFinished.");
 							if(!downloadStatus.contains(job))
 							{
+								String[] valuesForJob = new String[10];
 
+								System.out.println("Jobname:"+job.getJobname());
+								valuesForJob[0]=job.getJobname();
+								System.out.println("Number of CPUs:"+job.getCpus());
+								System.out.println("Host count:"+job.getHostCount());
+								valuesForJob[1]=job.getHostCount().toString();
+								System.out.println("job succeeded:"+job.isSuccessful(true));
+								valuesForJob[2]=String.valueOf(job.isSuccessful(true));
+
+								Integer cpus=job.getCpus();
+								valuesForJob[3]=""+cpus;
+								valuesForJob[4]=""+job.getWalltimeInSeconds();
+
+								try{
+									String jobLog=job.getFileContent("benchmark.log");
+									String holder=jobLog.substring(jobLog.lastIndexOf("Started:"));
+									Long long1=Long.parseLong(holder.substring(9,holder.indexOf("\n")));
+									holder=jobLog.substring(jobLog.lastIndexOf("Finished:"));
+									Long long2=Long.parseLong(holder.substring(10,holder.indexOf("\n")));
+
+									System.out.println("Time taken for execution:"+(long2-long1));
+									valuesForJob[5]=""+(long2-long1);
+									totalExecTime=(long2-long1);
+									Long totalAllCpus = totalExecTime * cpus;
+									valuesForJob[6]=""+totalAllCpus;
+									System.out.println(valuesForJob[6]);
+
+									allJobs.add(valuesForJob);
+
+									if ( cpus < minCpu ) 
+									{
+										minCpu = cpus;
+										minCpuWallTime = totalExecTime;
+									}
+								}
+								catch(Exception e)
+								{
+									System.out.println("job failed");
+									valuesForJob[5]=valuesForJob[6]=null;
+									errWriter.writeNext(valuesForJob);
+								}
+								
 								downloadStatus.add(job);
 							}
 						}
@@ -228,9 +227,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 					}
 					catch (NullPointerException e) {
 					}
-
 				}
-
 			}
 			// wait a few seconds, so we don't overload the backend
 			if ( flag ) {
@@ -241,165 +238,25 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			}
 
 		}
-
-
-		Collections.sort(downloadStatus, new Comparator<JobObject>(){
-			public int compare(JobObject j1, JobObject j2)
+		
+		Collections.sort(allJobs, new Comparator<String[]>(){
+			public int compare(String[] j1, String[] j2)
 			{
-				return j1.getCpus()-j2.getCpus();
+				return Integer.parseInt(j1[3])-Integer.parseInt(j2[3]);
 			}
 		});
 
-		List<String[]> allJobs = Lists.newArrayList();
 
-		Integer minCpu=9999;
-		Long minCpuWallTime=0L;
+		CsvBenchmarkRenderer csv=new CsvBenchmarkRenderer();
+		csv.renderer(jobname.substring(0, jobname.length()-1), allJobs, minCpu, minCpuWallTime);
 
-		for(JobObject job: downloadStatus)
-		{
-			String[] valuesForJob = new String[10];
-
-
-			System.out.println("Jobname:"+job.getJobname());
-			valuesForJob[0]=job.getJobname();
-			System.out.println("Number of CPUs:"+job.getCpus());
-			System.out.println("Host count:"+job.getHostCount());
-			valuesForJob[1]=job.getHostCount().toString();
-			//				try{
-			//					System.out.println("Stdout:"+job.getStdOutContent());
-			//					csvTemp[2]=job.getStdOutContent();
-			//				}
-			//				catch(JobException je){
-			//				//	je.printStackTrace();
-			//					csvTemp[2]="Could not read stdout file";
-			//				}
-			//				try
-			//				{
-			//					System.out.println("Stderr:"+job.getStdErrContent());
-			//					csvTemp[3]=job.getStdErrContent();
-			//				}
-			//				catch(JobException je){
-			//				//	je.printStackTrace();
-			//					csvTemp[3]="Could not read stderr file";
-			//				}
-			System.out.println("job succeeded:"+job.isSuccessful(true));
-			valuesForJob[2]=String.valueOf(job.isSuccessful(true));
-
-			//	    writer=new CSVWriter(new FileWriter(jobname+".csv"));
-
-			//		writer.close();
-			Integer cpus=job.getCpus();
-			valuesForJob[3]=""+cpus;
-			valuesForJob[4]=""+job.getWalltimeInSeconds();
-
-			try{
-				String jobLog=job.getFileContent("benchmark.log");
-				String holder=jobLog.substring(jobLog.lastIndexOf("Started:"));
-				Long long1=Long.parseLong(holder.substring(9,holder.indexOf("\n")));
-				holder=jobLog.substring(jobLog.lastIndexOf("Finished:"));
-				Long long2=Long.parseLong(holder.substring(10,holder.indexOf("\n")));
-
-				System.out.println("Time taken for execution:"+(long2-long1));
-				valuesForJob[5]=""+(long2-long1);
-				totalExecTime=(long2-long1);
-				Long totalAllCpus = totalExecTime * cpus;
-				valuesForJob[6]=""+totalAllCpus;
-				System.out.println(valuesForJob[6]);
-
-				//				writer.writeNext(valueNames);
-				//				htmlString.append(",\n['"+cpus+"', "+totalExecTime+", "+Double.parseDouble(valuesForJob[6])+", "+Double.parseDouble(valuesForJob[7])+"]");
-				//				tableString.append("<tr><td>"+valuesForJob[0]+"</td><td align=\"right\">"+cpus+"</td><td align=\"right\">"+totalExecTime+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(valuesForJob[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(valuesForJob[7]))+"</td></tr>");
-
-				allJobs.add(valuesForJob);
-
-				if ( cpus < minCpu ) {
-					minCpu = cpus;
-					minCpuWallTime = totalExecTime;
-				}
-
-			}
-			catch(Exception e)
-			{
-				System.out.println("job failed");
-				csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
-				errWriter.writeNext(valuesForJob);
-			}
-
-		}
-
-		for ( String[] values : allJobs ) {
-
-			double efficiency = minCpuWallTime.doubleValue()/(minCpu * Long.parseLong(values[6]));
-			values[7]=""+ efficiency;
-			System.out.println(values[7]);
-
-			htmlString.append(",\n['"+values[3]+"', "+values[5]+", "+Double.parseDouble(values[6])+"]");
-			effGraphString.append(",\n['"+values[3]+"', "+Double.parseDouble(values[7])+"]");
-//			tableString.append("<tr><td>"+values[0]+"</td><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
-			tableString.append("<tr><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
-			values[0]=null;
-			writer.writeNext(values);
-		}
-
-
-		//		csvTemp[0]="Total number of CPUs="+cpuCount;
-		//		System.out.println(csvTemp[0]);
-		//		csvTemp[1]="Total execution time="+totalExecTime;
-		//		System.out.println(csvTemp[1]);
-		//		csvTemp[2]="average execution time per CPU="+(totalExecTime/cpuCount);
-		//		System.out.println(csvTemp[2]);
-		//		csvTemp[3]="Efficiency="+ ((Integer)(minCpuWallTime)).doubleValue()/((Integer)((minCpu) * (cpuCount * totalExecTime))).doubleValue();
-		//		System.out.println(csvTemp[3]);
-		//		csvTemp[4]=csvTemp[5]=csvTemp[6]=null;
-		//		writer.writeNext(csvTemp);
-
-		effGraphString.append("\n]);");
-		tableString.append("</table>");
-		htmlString.append("\n]);"+
-				"\nvar options = {"+
-				"\ntitle: 'Benchmarking - Execution time for the job (ms) and Total Execution time accross all CPUs',"+
-				"axisTitlesPosition: 'out',"+
-				"hAxis: {title: \"Number of CPUs used for the job\"}"+
-				"\n};"+
-				"\nvar effoptions = {"+
-				"\ntitle: 'Benchmarking - CPUs v/s Efficiency',"+
-				"axisTitlesPosition: 'out',"+
-				"hAxis: {title: \"Number of CPUs used for the job\"}"+
-				"\n};"+
-				effGraphString+
-				"\nvar chart = new google.visualization.LineChart(document.getElementById('chart_div'));"+
-				"\nchart.draw(data, options);"+
-				"\nvar effchart = new google.visualization.LineChart(document.getElementById('effchart_div'));"+
-				"\neffchart.draw(effdata, effoptions);"+
-				"\n}"+
-				"\n</script>"+
-				"\n</head>"+
-				"\n<body>"+
-				"\n<div id=\"chart_div\" style=\"width: 900px; height: 500px;\"></div>"+
-				"\n<div id=\"effchart_div\" style=\"width: 900px; height: 500px;\"></div>"+
-				tableString+
-				"\n</body>"+
-				"\n</html>");
-		BufferedWriter out;
-		try {
-			out = new BufferedWriter(new FileWriter(jobname+"graph.html"));
-			out.write(new String(htmlString));
-			//Close the output stream
-			out.close();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		HtmlBenchmarkRenderer html=new HtmlBenchmarkRenderer();
+		html.renderer(jobname.substring(0, jobname.length()-1), allJobs, minCpu, minCpuWallTime);
 
 		try {
-			writer.close();
 			errWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	double trimDouble(double d) {
-		DecimalFormat df = new DecimalFormat("#.##");
-		return Double.valueOf(df.format(d));
 	}
 }

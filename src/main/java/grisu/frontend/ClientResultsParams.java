@@ -22,7 +22,7 @@ public class ClientResultsParams extends GrisuCliParameters {
 	}
 	
 	@Parameter(names = { "--list"}, description = "list all the jobs for benchmarking")
-	private boolean list = true;
+	private boolean list;
 	public Boolean getList() {
 		return list;
 	}
