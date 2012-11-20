@@ -51,14 +51,13 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 	public void run() {
 
 		String script = getCliParameters().getScript();
-		String scriptName=FileManager.getFilename(script);
+		
 		String cpu = getCliParameters().getCpu();
 		String group = getCliParameters().getGroup();
 		String queue = getCliParameters().getQueue();
 		String files = getCliParameters().getFiles();
 		List<String> envVarList=getCliParameters().getEnvVars();
-		
-		
+		String args=getCliParameters().getArgs();		
 
 		//merging older changes
 		int wallTime = getCliParameters().getWallTime();
@@ -71,6 +70,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.err.println("Please specify the script name");
 			System.exit(1);
 		}
+		String scriptName=FileManager.getFilename(script);
 
 		if(group==null)
 		{
@@ -107,7 +107,10 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.err.println("No queue specified.");
 			System.exit(1);
 		}
-
+		
+		if(args==null)
+			args="";
+		
 		String[] cpuSplit=cpu.split(",");
 		String[] temp = new String[3];
 		String[] filename;// = FileManager.getFilename(file);
@@ -133,7 +136,8 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.out.println("File to use for the job: " + script);
 
 			job.setApplication(Constants.GENERIC_APPLICATION_NAME);
-			job.setCommandline("sh " + scriptName);
+			job.setCommandline("sh " + scriptName + " "+ args);
+			System.out.println("commandline:"+job.getCommandline());
 			job.addInputFileUrl(script);
 			if(files!=null){
 				filename=files.split(",");
@@ -208,7 +212,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 				}
 			}
 
-			job.setTimestampJobname(jobName+"_"+job.getCpus()+"_cpus");
+			job.setTimestampJobname(jobName+"_"+toFourDigits(job.getCpus())+"_cpus");
 			System.out.println("Set jobname to be: " + job.getJobname());
 
 			try {
@@ -321,6 +325,15 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		System.out.println("Stdout: " + job.getStdOutContent());
 		System.out.println("Stderr: " + job.getStdErrContent());
 		 ***/
+	}
+
+	private String toFourDigits(Integer cpus) {
+		String cpuStr=cpus.toString();
+		while(cpuStr.length()<4)
+		{
+			cpuStr="0"+cpuStr;
+		}
+		return cpuStr;
 	}
 
 }

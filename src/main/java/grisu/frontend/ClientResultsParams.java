@@ -20,5 +20,11 @@ public class ClientResultsParams extends GrisuCliParameters {
 	public Boolean getNowait() {
 		return nowait;
 	}
+	
+	@Parameter(names = { "--list"}, description = "list all the jobs for benchmarking")
+	private boolean list = true;
+	public Boolean getList() {
+		return list;
+	}
 
 }
