@@ -6,9 +6,18 @@ echo "Cat'ting input file:"
 
 cat testfile.txt
 
-echo "Sleeping 30 seconds."
+seconds=$(($GRISU_CPUS * 30))
 
-sleep 30
+sleeptime=$((600 - $seconds))
+
+echo "Sleeping $sleeptime seconds."
+
+for i in $(eval echo {1..$GRISU_CPUS})
+do
+	hostname >> hostfile
+done
+
+sleep $sleeptime
 
 echo "Slept well."
 
