@@ -59,28 +59,28 @@ For this testjob we also need a textfile with some random content. Created that 
 
 ##### Available commandline parameters for benchmark submission
 
---script (required)
+_--script_ (required):
 the script that wraps the job that needs to be benchmarked, needs to write out a file called _benchmark.log_ (see above example)
 
---cpu
+_--cpu_:
 specifies the series of CPUs to be used for this benchmark as a comma separated list. You can also specify run-specific hostcount and walltime, format is: cpu-count=hostcount[walltime] (where hostcount and walltime are optional, walltime in seconds or format like 2d10h22m)
 
--n or --jobname (required)
+_-n_ or _--jobname_ (required):
 the basename for all jobs of this benchmark run, the number of cpus and a current timestamp is appended to each job.
 
--q or --queue (required)
+_-q_ or _--queue_ (required):
 the queue to which the job should be submitted, for example: pan:pan.nesi.org.nz
 
--w or --walltime (required)
+_-w_ or _--walltime_ (required):
 the default wall time for each job (if not specified in the --cpus option), in seconds or format like: 2d10h12m
 
---group (required)
+_--group_ (required):
 the group for running the benchmark
 
---single or --mpi (optional) 
+_--single_ or _--mpi_ (optional):
 forcing to single or mpi (mind, mpi does not make sense most of the time)
 
---env (optional)
+_--env_ (optional):
 allows to set additional environment variables for a job, something like: --env LL_VAR=requirements=(Feature==\"sandybridge\") --env otherkey=othervalue
 
 #### Gathering the benchmark results
