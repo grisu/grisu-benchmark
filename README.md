@@ -81,7 +81,9 @@ _--single_ or _--mpi_ (optional):
 forcing to single or mpi (mind, mpi does not make sense most of the time)
 
 _--env_ (optional):
-allows to set additional environment variables for a job, something like: --env LL_VAR=requirements=(Feature==\"sandybridge\") --env otherkey=othervalue
+allows to set additional environment variables for a job, something like: 
+
+    --env LL_VAR=requirements=(Feature==\"sandybridge\") --env otherkey=othervalue
 
 #### Gathering the benchmark results
 
