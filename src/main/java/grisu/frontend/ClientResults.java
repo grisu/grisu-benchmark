@@ -293,7 +293,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		tableString.append("</table>");
 		htmlString.append("\n]);"+
 				"\nvar options = {"+
-				"\ntitle: 'Benchmarking - CPUs v/s Total Execution time for the job (ms) and Execution time per CPU',"+
+				"\ntitle: 'Benchmarking - CPUs v/s Execution time for the job (ms) and Total Execution time accross all CPUs',"+
 				"axisTitlesPosition: 'out',"+
 				"hAxis: {title: \"Number of CPUs used for the job\"}"+
 				"\n};"+
