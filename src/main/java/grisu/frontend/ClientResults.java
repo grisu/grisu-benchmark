@@ -25,7 +25,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.Lists;
 
 public class ClientResults extends GrisuCliClient<ClientResultsParams> {
-	
+
 	private static final int waittime = 10;
 
 	public static void main(String[] args) {
@@ -63,15 +63,76 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 	public void run() {
 
 		String jobname = getCliParameters().getJobName();
-		
+
 		boolean nowait = getCliParameters().getNowait();
-				
+
+		boolean list = getCliParameters().getList();
+
+		if(jobname==null && !list)
+			System.out.println("Please enter a job name or use the --list option");
+		System.out.println("Getting serviceinterface...");
+		ServiceInterface si = null;
+		try {
+			si = getServiceInterface();
+		} catch (Exception e) {
+			System.err.println("Could not login: " + e.getLocalizedMessage());
+			System.exit(1);
+		}		
+
+		FileManager fm = GrisuRegistryManager.getDefault(si).getFileManager();
+		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si).getUserEnvironmentManager();
+		SortedSet<DtoJob> currentJobs = uem.getCurrentJobs(true);
+		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);	
+
+		//JobObject job; 
+
+		if(list)
+		{
+			String jnConst="";
+			int index;
+			int jCount=0;
+			int jOn=0;
+			int jFinished=0;
+			for(String jobName:currentJobList)
+			{
+				if(jobName.contains("_cpus_"))
+				{
+					index = jobName.indexOf("_cpus_");
+					if(!jobName.substring(0, index-5).equals(jnConst))
+					{
+						jnConst=jobName.substring(0, index-5);
+						if(jCount!=0)
+						{
+							System.out.print("\tJob Count: "+jCount+"\tFinished jobs count: "+jFinished+"\tIn progress jobs count: "+jOn);
+							jCount=0;
+							jFinished=0;
+							jOn=0;
+						}
+						System.out.print("\n"+jnConst);
+					}
+					JobObject job;
+					try 
+					{
+						job = new JobObject(si, jobName);
+						if(job.isFinished())
+							jFinished++;
+						else
+							jOn++;
+						jCount++;
+					} catch (NoSuchJobException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			System.out.print("\tJob Count: "+jCount+"\tFinished jobs count: "+jFinished+"\tIn progress jobs count: "+jOn);
+			System.exit(0);
+		}
 
 		CSVWriter writer = null;
 		CSVWriter errWriter = null;
 		String[] csvTemp = new String[10];
 
-		csvTemp[0]="Job name";
+		//csvTemp[0]="Job name";
 		csvTemp[1]="Host count";
 		csvTemp[2]="Job success status";
 		csvTemp[3]="CPUs";
@@ -92,7 +153,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 		StringBuffer tableString=new StringBuffer("<table border=\"1\">"+
 				"<tr>"+
-				"<th>Job name</th>"+
+//				"<th>Job name</th>"+
 				"<th>Number of CPUs</th>"+
 				"<th>Execution time for the job</th>"+
 				"<th>Total Execution time across all CPUs</th>"+
@@ -107,6 +168,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			errWriter = new CSVWriter(new FileWriter(jobname+"_err.csv"));
 			writer.writeNext(csvTemp);
 			csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
+			csvTemp[0]="Job name";
 			errWriter.writeNext(csvTemp);
 
 		} catch (IOException e) {
@@ -114,20 +176,20 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		}
 
 
+		//
+		//		System.out.println("Getting serviceinterface...");
+		//		ServiceInterface si = null;
+		//		try {
+		//			si = getServiceInterface();
+		//		} catch (Exception e) {
+		//			System.err.println("Could not login: " + e.getLocalizedMessage());
+		//			System.exit(1);
+		//		}
 
-		System.out.println("Getting serviceinterface...");
-		ServiceInterface si = null;
-		try {
-			si = getServiceInterface();
-		} catch (Exception e) {
-			System.err.println("Could not login: " + e.getLocalizedMessage());
-			System.exit(1);
-		}
-
-		FileManager fm = GrisuRegistryManager.getDefault(si).getFileManager();
-		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si).getUserEnvironmentManager();
-		SortedSet<DtoJob> currentJobs = uem.getCurrentJobs(true);
-		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
+		//		FileManager fm = GrisuRegistryManager.getDefault(si).getFileManager();
+		//		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si).getUserEnvironmentManager();
+		//		SortedSet<DtoJob> currentJobs = uem.getCurrentJobs(true);
+		//		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
 		Boolean flag=true;
 		List<JobObject> downloadStatus=new ArrayList<JobObject>();
 		int cpuCount=0;
@@ -138,7 +200,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			flag=false;
 			for(String jname:currentJobList)
 			{
-				
+
 				if(jname.contains(jobname)){
 					System.out.println("Checking job: "+jname);
 					try 
@@ -168,7 +230,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 					}
 
 				}
-				
+
 			}
 			// wait a few seconds, so we don't overload the backend
 			if ( flag ) {
@@ -187,7 +249,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				return j1.getCpus()-j2.getCpus();
 			}
 		});
-		
+
 		List<String[]> allJobs = Lists.newArrayList();
 
 		Integer minCpu=9999;
@@ -197,7 +259,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		{
 			String[] valuesForJob = new String[10];
 
-			
+
 			System.out.println("Jobname:"+job.getJobname());
 			valuesForJob[0]=job.getJobname();
 			System.out.println("Number of CPUs:"+job.getCpus());
@@ -244,17 +306,17 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				valuesForJob[6]=""+totalAllCpus;
 				System.out.println(valuesForJob[6]);
 
-//				writer.writeNext(valueNames);
-//				htmlString.append(",\n['"+cpus+"', "+totalExecTime+", "+Double.parseDouble(valuesForJob[6])+", "+Double.parseDouble(valuesForJob[7])+"]");
-//				tableString.append("<tr><td>"+valuesForJob[0]+"</td><td align=\"right\">"+cpus+"</td><td align=\"right\">"+totalExecTime+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(valuesForJob[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(valuesForJob[7]))+"</td></tr>");
+				//				writer.writeNext(valueNames);
+				//				htmlString.append(",\n['"+cpus+"', "+totalExecTime+", "+Double.parseDouble(valuesForJob[6])+", "+Double.parseDouble(valuesForJob[7])+"]");
+				//				tableString.append("<tr><td>"+valuesForJob[0]+"</td><td align=\"right\">"+cpus+"</td><td align=\"right\">"+totalExecTime+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(valuesForJob[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(valuesForJob[7]))+"</td></tr>");
 
 				allJobs.add(valuesForJob);
-				
+
 				if ( cpus < minCpu ) {
 					minCpu = cpus;
 					minCpuWallTime = totalExecTime;
 				}
-				
+
 			}
 			catch(Exception e)
 			{
@@ -262,7 +324,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
 				errWriter.writeNext(valuesForJob);
 			}
-			
+
 		}
 
 		for ( String[] values : allJobs ) {
@@ -270,13 +332,15 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			double efficiency = minCpuWallTime.doubleValue()/(minCpu * Long.parseLong(values[6]));
 			values[7]=""+ efficiency;
 			System.out.println(values[7]);
-			
-			writer.writeNext(values);
+
 			htmlString.append(",\n['"+values[3]+"', "+values[5]+", "+Double.parseDouble(values[6])+"]");
 			effGraphString.append(",\n['"+values[3]+"', "+Double.parseDouble(values[7])+"]");
-			tableString.append("<tr><td>"+values[0]+"</td><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
+//			tableString.append("<tr><td>"+values[0]+"</td><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
+			tableString.append("<tr><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
+			values[0]=null;
+			writer.writeNext(values);
 		}
-		
+
 
 		//		csvTemp[0]="Total number of CPUs="+cpuCount;
 		//		System.out.println(csvTemp[0]);

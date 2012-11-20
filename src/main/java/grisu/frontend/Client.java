@@ -208,7 +208,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 				}
 			}
 
-			job.setTimestampJobname(jobName+"_"+job.getCpus()+"_cpus");
+			job.setTimestampJobname(jobName+"_"+toFourDigits(job.getCpus())+"_cpus");
 			System.out.println("Set jobname to be: " + job.getJobname());
 
 			try {
@@ -321,6 +321,15 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		System.out.println("Stdout: " + job.getStdOutContent());
 		System.out.println("Stderr: " + job.getStdErrContent());
 		 ***/
+	}
+
+	private String toFourDigits(Integer cpus) {
+		String cpuStr=cpus.toString();
+		while(cpuStr.length()<4)
+		{
+			cpuStr="0"+cpuStr;
+		}
+		return cpuStr;
 	}
 
 }
