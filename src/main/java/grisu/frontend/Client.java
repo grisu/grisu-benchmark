@@ -51,7 +51,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 	public void run() {
 
 		String script = getCliParameters().getScript();
-		String scriptName=FileManager.getFilename(script);
+		
 		String cpu = getCliParameters().getCpu();
 		String group = getCliParameters().getGroup();
 		String queue = getCliParameters().getQueue();
@@ -71,6 +71,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.err.println("Please specify the script name");
 			System.exit(1);
 		}
+		String scriptName=FileManager.getFilename(script);
 
 		if(group==null)
 		{
