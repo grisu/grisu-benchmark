@@ -259,6 +259,8 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			catch(Exception e)
 			{
 				System.out.println("job failed");
+				csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
+				errWriter.writeNext(valuesForJob);
 			}
 			
 		}
@@ -273,8 +275,6 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			htmlString.append(",\n['"+values[3]+"', "+values[5]+", "+Double.parseDouble(values[6])+"]");
 			effGraphString.append(",\n['"+values[3]+"', "+Double.parseDouble(values[7])+"]");
 			tableString.append("<tr><td>"+values[0]+"</td><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
-
-			
 		}
 		
 
@@ -293,7 +293,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		tableString.append("</table>");
 		htmlString.append("\n]);"+
 				"\nvar options = {"+
-				"\ntitle: 'Benchmarking - CPUs v/s Total Execution time for the job (ms) and Execution time per CPU',"+
+				"\ntitle: 'Benchmarking - Execution time for the job (ms) and Total Execution time accross all CPUs',"+
 				"axisTitlesPosition: 'out',"+
 				"hAxis: {title: \"Number of CPUs used for the job\"}"+
 				"\n};"+
@@ -328,6 +328,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 		try {
 			writer.close();
+			errWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
