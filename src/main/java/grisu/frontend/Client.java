@@ -57,8 +57,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		String queue = getCliParameters().getQueue();
 		String files = getCliParameters().getFiles();
 		List<String> envVarList=getCliParameters().getEnvVars();
-		
-		
+		String args=getCliParameters().getArgs();		
 
 		//merging older changes
 		int wallTime = getCliParameters().getWallTime();
@@ -108,7 +107,10 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.err.println("No queue specified.");
 			System.exit(1);
 		}
-
+		
+		if(args==null)
+			args="";
+		
 		String[] cpuSplit=cpu.split(",");
 		String[] temp = new String[3];
 		String[] filename;// = FileManager.getFilename(file);
@@ -134,7 +136,8 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.out.println("File to use for the job: " + script);
 
 			job.setApplication(Constants.GENERIC_APPLICATION_NAME);
-			job.setCommandline("sh " + scriptName);
+			job.setCommandline("sh " + scriptName + " "+ args);
+			System.out.println("commandline:"+job.getCommandline());
 			job.addInputFileUrl(script);
 			if(files!=null){
 				filename=files.split(",");

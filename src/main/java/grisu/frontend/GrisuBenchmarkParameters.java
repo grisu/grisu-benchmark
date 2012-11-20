@@ -87,5 +87,10 @@ public class GrisuBenchmarkParameters extends GrisuCliParameters {
 		return envVars;
 	}			
 
+	@Parameter(names = {"--arg"}, description = "the srguments for the script specified")
+	private String args;
 
+	public String getArgs(){
+		return args;
+	}	
 }
