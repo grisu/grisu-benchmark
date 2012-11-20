@@ -88,7 +88,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				"\ngoogle.setOnLoadCallback(drawChart);"+
 				"\nfunction drawChart() {"+
 				"\nvar data = google.visualization.arrayToDataTable(["+
-				"\n['Number of CPUs', 'Execution time for the job', 'Total Execution Time across all CPUs', 'Efficiency']");
+				"\n['Number of CPUs', 'Execution time for the job', 'Total Execution Time across all CPUs']");
 
 		StringBuffer tableString=new StringBuffer("<table border=\"1\">"+
 				"<tr>"+
