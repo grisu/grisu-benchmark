@@ -352,7 +352,10 @@
 									<groupname>root</groupname>
 									<sources>
 										<source>
-											<location>src/pkg/data/grisu-benchmark</location>
+											<location>src/pkg/data/grisu-benchmark-results</location>
+										</source>
+										<source>
+											<location>src/pkg/data/grisu-benchmark-submit</location>
 										</source>
 									</sources>
 								</mapping>
