@@ -63,7 +63,9 @@ _--script_ (required):
 the script that wraps the job that needs to be benchmarked, needs to write out a file called _benchmark.log_ (see above example)
 
 _--cpu_:
-specifies the series of CPUs to be used for this benchmark as a comma separated list. You can also specify run-specific hostcount and walltime, format is: cpu-count=hostcount[walltime] (where hostcount and walltime are optional, walltime in seconds or format like 2d10h22m)
+specifies the series of CPUs to be used for this benchmark as a comma separated list. You can also specify run-specific hostcount and walltime, format is: 
+
+    cpu-count=hostcount[walltime] # where hostcount and walltime are optional, walltime in seconds or format like 2d10h22m
 
 _-n_ or _--jobname_ (required):
 the basename for all jobs of this benchmark run, the number of cpus and a current timestamp is appended to each job.
