@@ -88,7 +88,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				"\ngoogle.setOnLoadCallback(drawChart);"+
 				"\nfunction drawChart() {"+
 				"\nvar data = google.visualization.arrayToDataTable(["+
-				"\n['Number of CPUs', 'Total Execution time for the job', 'Execution Time per CPU (ms)', 'Efficiency']");
+				"\n['Number of CPUs', 'Total Execution time for the job', 'Execution Time per CPU (ms)']");
 
 		StringBuffer tableString=new StringBuffer("<table border=\"1\">"+
 				"<tr>"+
@@ -99,6 +99,8 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				"<th>Efficiency</th>"+
 				"</tr>");
 
+		StringBuffer effGraphString=new StringBuffer("\nvar effdata = google.visualization.arrayToDataTable(["+
+				"\n['Number of CPUs', 'Efficiency']");
 
 		try {
 			writer = new CSVWriter(new FileWriter(jobname+".csv"));
@@ -268,7 +270,8 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			System.out.println(values[7]);
 			
 			writer.writeNext(values);
-			htmlString.append(",\n['"+values[3]+"', "+values[5]+", "+Double.parseDouble(values[6])+", "+Double.parseDouble(values[7])+"]");
+			htmlString.append(",\n['"+values[3]+"', "+values[5]+", "+Double.parseDouble(values[6])+"]");
+			effGraphString.append(",\n['"+values[3]+"', "+Double.parseDouble(values[7])+"]");
 			tableString.append("<tr><td>"+values[0]+"</td><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
 
 			
@@ -285,20 +288,31 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		//		System.out.println(csvTemp[3]);
 		//		csvTemp[4]=csvTemp[5]=csvTemp[6]=null;
 		//		writer.writeNext(csvTemp);
+
+		effGraphString.append("\n]);");
 		tableString.append("</table>");
 		htmlString.append("\n]);"+
 				"\nvar options = {"+
-				"\ntitle: 'Benchmarking',"+
+				"\ntitle: 'Benchmarking - CPUs v/s Total Execution time for the job (ms) and Execution time per CPU',"+
 				"axisTitlesPosition: 'out',"+
 				"hAxis: {title: \"Number of CPUs used for the job\"}"+
 				"\n};"+
+				"\nvar effoptions = {"+
+				"\ntitle: 'Benchmarking - CPUs v/s Efficiency',"+
+				"axisTitlesPosition: 'out',"+
+				"hAxis: {title: \"Number of CPUs used for the job\"}"+
+				"\n};"+
+				effGraphString+
 				"\nvar chart = new google.visualization.LineChart(document.getElementById('chart_div'));"+
 				"\nchart.draw(data, options);"+
+				"\nvar effchart = new google.visualization.LineChart(document.getElementById('effchart_div'));"+
+				"\neffchart.draw(effdata, effoptions);"+
 				"\n}"+
 				"\n</script>"+
 				"\n</head>"+
 				"\n<body>"+
 				"\n<div id=\"chart_div\" style=\"width: 900px; height: 500px;\"></div>"+
+				"\n<div id=\"effchart_div\" style=\"width: 900px; height: 500px;\"></div>"+
 				tableString+
 				"\n</body>"+
 				"\n</html>");
