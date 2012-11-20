@@ -273,7 +273,18 @@
 											</mapper>
 										</data>
 										<data>
-											<src>${project.basedir}/src/pkg/data/grisu-benchmark</src>
+											<src>${project.basedir}/src/pkg/data/grisu-benchmark-submit</src>
+											<type>file</type>
+											<mapper>
+												<type>perm</type>
+												<prefix>/usr/bin/</prefix>
+												<user>root</user>
+												<group>root</group>
+												<filemode>755</filemode>
+											</mapper>
+										</data>
+										<data>
+											<src>${project.basedir}/src/pkg/data/grisu-benchmark-results</src>
 											<type>file</type>
 											<mapper>
 												<type>perm</type>
