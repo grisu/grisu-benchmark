@@ -1,4 +1,5 @@
 package grisu.frontend;
+
 import grisu.frontend.model.job.JobObject;
 
 import java.io.FileWriter;
@@ -7,64 +8,73 @@ import java.util.List;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
-public class CsvBenchmarkRenderer implements BenchmarkRenderer
-{
+public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 
 	@Override
-	public void renderer(String jobname, List<String[]> jobs, int minCpus, Long minRuntime) {
-		
+	public void renderer(BenchmarkJob bJob) {
+
 		CSVWriter writer = null;
-		String[] csvTemp = new String[10];
-		csvTemp[1]="Host count";
-		csvTemp[2]="Job success status";
-		csvTemp[3]="CPUs";
-		csvTemp[4]="Wall time";
-		csvTemp[5]="Job execution time";
-		csvTemp[6]="Execution time across all CPUs";
-		csvTemp[7]="Efficiency";
-		
+		CSVWriter errWriter = null;
+		String[] jobValues = new String[10];
+		jobValues[1] = "Host count";
+		jobValues[2] = "Job success status";
+		jobValues[3] = "CPUs";
+		jobValues[4] = "Wall time";
+		jobValues[5] = "Job execution time";
+		jobValues[6] = "Execution time across all CPUs";
+		jobValues[7] = "Efficiency";
+
 		try {
-			writer = new CSVWriter(new FileWriter(jobname+".csv"));
-			//errWriter = new CSVWriter(new FileWriter(jobname+"_err.csv"));
-			writer.writeNext(csvTemp);
-			csvTemp[5]=csvTemp[6]=csvTemp[7]=null;
-			csvTemp[0]="Job name";
-		//	errWriter.writeNext(csvTemp);
+			writer = new CSVWriter(new FileWriter(bJob.getJobname() + ".csv"));
+			errWriter = new CSVWriter(new FileWriter(bJob.getJobname()	+ "_err.csv"));
+			writer.writeNext(jobValues);
+			jobValues[5] = jobValues[6] = jobValues[7] = null;
+			jobValues[0] = "Job name";
+			errWriter.writeNext(jobValues);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+		Long executionTime;
+		Long totalExecutionTime;
+		int cpus;
 
-		for ( String[] values : jobs ) {
+		for (JobObject job : bJob.getJobs().keySet()) {
+			jobValues[1] = "" + job.getHostCount();
+			jobValues[2] = "" + job.isSuccessful(true);
 
-			double efficiency = minRuntime.doubleValue()/(minCpus * Long.parseLong(values[6]));
-			values[7]=""+ efficiency;
-			System.out.println(values[7]);
+			cpus = job.getCpus();
+			jobValues[3] = "" + cpus;
+			jobValues[4] = "" + job.getWalltimeInSeconds();
 
-//			htmlString.append(",\n['"+values[3]+"', "+values[5]+", "+Double.parseDouble(values[6])+"]");
-//			effGraphString.append(",\n['"+values[3]+"', "+Double.parseDouble(values[7])+"]");
-//			tableString.append("<tr><td>"+values[0]+"</td><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
-//			tableString.append("<tr><td align=\"right\">"+values[3]+"</td><td align=\"right\">"+values[5]+"</td><td align=\"right\">"+trimDouble(Double.parseDouble(values[6]))+"</td><td align=\"right\"> "+trimDouble(Double.parseDouble(values[7]))+"</td></tr>");
-			values[0]=null;
-			writer.writeNext(values);
+			executionTime = bJob.getJobs().get(job);
+			if (executionTime != null) {
+				jobValues[5] = "" + executionTime;
+
+				totalExecutionTime = (executionTime * cpus);
+				jobValues[6] = "" + totalExecutionTime;
+
+				double efficiency = bJob.getMinRunTime().doubleValue()
+						/ (bJob.getMinCpus() * totalExecutionTime);
+				jobValues[7] = "" + efficiency;
+				System.out.println(jobValues[7]);
+
+				jobValues[0] = null;
+				writer.writeNext(jobValues);
+			} else {
+				jobValues[0] = job.getJobname();
+				jobValues[5] = jobValues[6] = jobValues[7] = null;
+				errWriter.writeNext(jobValues);
+			}
 		}
 
 		try {
 			writer.close();
-		//	errWriter.close();
+			errWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-
 	}
-//
-//	@Override
-//	public void renderer(String jobname, List<? extends Object> jobs,
-//			int minCpus, long minRuntime) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-	
 }
