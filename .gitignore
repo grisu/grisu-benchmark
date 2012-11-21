@@ -11,3 +11,5 @@ nb-configuration.xml
 rebel.xml
 grisu-server.config
 tempInput.txt
+*.csv
+*.html
