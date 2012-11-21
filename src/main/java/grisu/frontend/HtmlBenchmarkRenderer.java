@@ -76,7 +76,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		tableString.append("</table>");
 		htmlString.append("\n]);"
 						+ "\nvar options = {"
-						+ "\ntitle: 'Benchmarking - Execution time for the job (ms) and Total Execution time accross all CPUs',"
+						+ "\ntitle: 'Benchmarking - Execution time for the job and Total Execution time accross all CPUs',"
 						+ "axisTitlesPosition: 'out',"
 						+ "hAxis: {title: \"Number of CPUs used for the job\"}"
 						+ "\n};"
