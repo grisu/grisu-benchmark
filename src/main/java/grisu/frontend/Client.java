@@ -64,7 +64,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		String wallTime = getCliParameters().getWallTime();
 		String jobName = getCliParameters().getJobName();
 		Boolean mpi = getCliParameters().getMpi();
-		Boolean single = getCliParameters().getSingle();
+//		Boolean single = getCliParameters().getSingle();
 
 		if (script == null) {
 			System.err.println("Please specify the script name");
@@ -90,10 +90,10 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.exit(1);
 		}
 
-		if (mpi && single) {
-			System.err.println("Cannot set job type to both mpi and single");
-			System.exit(1);
-		}
+//		if (mpi && single) {
+//			System.err.println("Cannot set job type to both mpi and single");
+//			System.exit(1);
+//		}
 
 		if (queue == null) {
 			System.err.println("No queue specified.");
@@ -141,10 +141,11 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 				System.err.println("Can't parse walltime: " + wallTime);
 				System.exit(1);
 			}
-			if (mpi != null)
+			if (mpi != null && mpi)
 				job.setForce_mpi(mpi);
-			if (single != null)
-				job.setForce_single(single);
+			else 
+				job.setForce_single(true);
+
 
 			System.out.println("jobtype: mpi-" + job.isForce_mpi() + " single-"
 					+ job.isForce_single());

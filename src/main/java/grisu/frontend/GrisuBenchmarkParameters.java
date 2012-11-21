@@ -16,12 +16,12 @@ public class GrisuBenchmarkParameters extends GrisuCliParameters {
 		return mpi;
 	}
 
-	@Parameter(names = { "--single"}, description = "sets the job type to be single")
-	private boolean single;
-
-	public Boolean getSingle(){
-		return single;
-	}
+//	@Parameter(names = { "--single"}, description = "sets the job type to be single")
+//	private boolean single;
+//
+//	public Boolean getSingle(){
+//		return single;
+//	}
 
 	@Parameter(names = {"-n", "--jobname"}, description = "the name for the job")
 	private String jobName;
