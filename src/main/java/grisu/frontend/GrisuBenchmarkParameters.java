@@ -31,9 +31,9 @@ public class GrisuBenchmarkParameters extends GrisuCliParameters {
 	}
 
 	@Parameter(names = {"-w", "--walltime"}, description = "the wall time for every job")
-	private int wallTime;
+	private String wallTime;
 
-	public int getWallTime(){
+	public String getWallTime(){
 		return wallTime;
 	}
 

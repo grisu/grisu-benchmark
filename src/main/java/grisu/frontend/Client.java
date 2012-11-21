@@ -60,7 +60,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		String args=getCliParameters().getArgs();		
 
 		//merging older changes
-		int wallTime = getCliParameters().getWallTime();
+		String wallTime = getCliParameters().getWallTime();
 		String jobName = getCliParameters().getJobName();
 		Boolean mpi = getCliParameters().getMpi();
 		Boolean single = getCliParameters().getSingle();
@@ -90,7 +90,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.exit(1);
 		}
 
-		if(wallTime==0)
+		if(StringUtils.isBlank(wallTime))
 		{
 			System.err.println("Please specify wall time");
 			System.exit(1);
@@ -146,7 +146,12 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 					job.addInputFileUrl(filename[j]);
 				}
 			}
-			job.setWalltimeInSeconds(wallTime);
+			try {
+				job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(wallTime));
+			} catch (Exception e1) {
+				System.err.println("Can't parse walltime: "+wallTime);
+				System.exit(1);
+			}
 			if(mpi!=null)
 				job.setForce_mpi(mpi);
 			if(single!=null)
@@ -169,7 +174,8 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 				try {
 					job.setWalltimeInSeconds(WalltimeUtils.fromShortStringToSeconds(holder));
 				} catch (Exception e) {
-					System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string"); 
+					System.err.println("Can't parse walltime: "+holder);
+					System.exit(1);
 //					e.printStackTrace();
 				}
 
