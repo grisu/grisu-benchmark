@@ -125,7 +125,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			}
 			System.out.print("\tJob Count: " + jCount
 					+ "\tFinished jobs count: " + jFinished
-					+ "\tIn progress jobs count: " + jOn);
+					+ "\tIn progress jobs count: " + jOn+"\n");
 			System.exit(0);
 		}
 
