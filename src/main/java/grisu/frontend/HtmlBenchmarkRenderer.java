@@ -54,8 +54,8 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 				totalExecutionTime = (executionTime * cpus);
 				jobValues[6] = "" + (executionTime * cpus);
 
-				double efficiency = bJob.getMinRunTime().doubleValue()
-						/ (bJob.getMinCpus() * totalExecutionTime);
+				double efficiency = (bJob.getMinCpus() * bJob.getMinRunTime().doubleValue())
+						/ totalExecutionTime;
 				jobValues[7] = "" + efficiency;
 				System.out.println(jobValues[7]);
 
