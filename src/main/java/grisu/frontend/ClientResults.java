@@ -88,7 +88,8 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
 
 		// if --list option is specified
-		if (list) {
+		if (list) 
+		{
 			String jnConst = "";
 			int index;
 			int jCount = 0;
