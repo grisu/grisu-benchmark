@@ -148,6 +148,8 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			concatJobnames.append(bJob.getJobname()+"_");
 		}
 		
+		if(concatJobnames.length()>200)
+			concatJobnames=new StringBuffer(concatJobnames.substring(0, 200));
 		html.populateGraph(concatJobnames);
 	
 	//	HtmlBenchmarkRenderer html = new HtmlBenchmarkRenderer();
