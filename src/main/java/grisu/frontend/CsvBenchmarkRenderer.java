@@ -26,7 +26,8 @@ public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 
 		try {
 			writer = new CSVWriter(new FileWriter(bJob.getJobname() + ".csv"));
-			errWriter = new CSVWriter(new FileWriter(bJob.getJobname()	+ "_err.csv"));
+			errWriter = new CSVWriter(new FileWriter(bJob.getJobname()
+					+ "_err.csv"));
 			writer.writeNext(jobValues);
 			jobValues[5] = jobValues[6] = jobValues[7] = null;
 			jobValues[0] = "Job name";
@@ -40,32 +41,32 @@ public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 		Long totalExecutionTime;
 		int cpus;
 
-		for (JobObject job : bJob.getJobs().keySet()) {
+		for (JobDetailsVO job : bJob.getJobs()) {
+			jobValues[0] = job.getJobName();
 			jobValues[1] = "" + job.getHostCount();
-			jobValues[2] = "" + job.isSuccessful(true);
+			jobValues[2] = "" + job.getStatus();
 
 			cpus = job.getCpus();
 			jobValues[3] = "" + cpus;
-			jobValues[4] = "" + job.getWalltimeInSeconds();
+			jobValues[4] = "" + job.getWallTime();
 
-			executionTime = bJob.getJobs().get(job);
+			// executionTime = bJob.getJobs().get(job);
+			executionTime = job.getExecutionTime();
 			if (executionTime != null) {
 				jobValues[5] = "" + executionTime;
 
-				totalExecutionTime = (executionTime * cpus);
+				totalExecutionTime = job.getTotalExecutionTime();
 				jobValues[6] = "" + totalExecutionTime;
 
-				double efficiency = (bJob.getMinCpus() * bJob.getMinRunTime().doubleValue())
-						/ totalExecutionTime;
+				double efficiency = (bJob.getMinCpus() * bJob.getMinRunTime()
+						.doubleValue()) / totalExecutionTime;
 				jobValues[7] = "" + efficiency;
 				System.out.println(jobValues[7]);
 
-				jobValues[0] = null;
 				writer.writeNext(jobValues);
 			} else {
-				jobValues[0] = job.getJobname();
 				jobValues[5] = jobValues[6] = jobValues[7] = null;
-				errWriter.writeNext(jobValues);
+				writer.writeNext(jobValues);
 			}
 		}
 
@@ -77,4 +78,5 @@ public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 		}
 
 	}
+
 }

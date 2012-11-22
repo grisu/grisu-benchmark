@@ -9,10 +9,10 @@ import com.beust.jcommander.Parameter;
 public class ClientResultsParams extends GrisuCliParameters {
 
 	@Parameter(names = {"-n", "--jobname"}, description = "the name for the job")
-	private String jobName;
+	private List<String> jobNames;
 
-	public String getJobName(){
-		return jobName;
+	public List<String> getJobNames(){
+		return jobNames;
 	}
 	
 	@Parameter(names = { "--no-wait"}, description = "don't wait for all jobs to finish")

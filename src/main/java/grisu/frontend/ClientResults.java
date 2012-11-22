@@ -65,15 +65,15 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 	@Override
 	public void run() {
 
-		String jobname = getCliParameters().getJobName();
+		List<String> jobnames = getCliParameters().getJobNames();
 
 		boolean nowait = getCliParameters().getNowait();
 
 		boolean list = getCliParameters().getList();
 
-		if (jobname == null && !list)
+		if (jobnames == null && !list)
 			System.out
-					.println("Please enter a job name or use the --list option");
+					.println("Please specify a job name or use the --list option");
 		System.out.println("Getting serviceinterface...");
 		ServiceInterface si = null;
 		try {
@@ -88,8 +88,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
 
 		// if --list option is specified
-		if (list) 
-		{
+		if (list) {
 			String jnConst = "";
 			int index;
 			int jCount = 0;
@@ -125,17 +124,28 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			}
 			System.out.print("\tJob Count: " + jCount
 					+ "\tFinished jobs count: " + jFinished
-					+ "\tIn progress jobs count: " + jOn+"\n");
+					+ "\tIn progress jobs count: " + jOn + "\n");
 			System.exit(0);
 		}
 
-		// for --jobname option
-		BenchmarkJob bJob = new BenchmarkJob(si, jobname, nowait);
-
-		CsvBenchmarkRenderer csv = new CsvBenchmarkRenderer();
-		csv.renderer(bJob);
-
+		StringBuffer concatJobnames=new StringBuffer("");
 		HtmlBenchmarkRenderer html = new HtmlBenchmarkRenderer();
-		html.renderer(bJob);
+		for (int i = 0; i < jobnames.size(); i++) {
+			// for --jobname option
+			BenchmarkJob bJob = new BenchmarkJob(si, jobnames.get(i), nowait);
+			if(!jobnames.get(i).endsWith(".csv"))
+			{
+				CsvBenchmarkRenderer csv = new CsvBenchmarkRenderer();
+				csv.renderer(bJob);
+			}
+			
+			html.renderer(bJob);
+			concatJobnames.append(jobnames.get(i)+"_");
+		}
+		
+		html.populateGraph(concatJobnames);
+	
+	//	HtmlBenchmarkRenderer html = new HtmlBenchmarkRenderer();
+	//	html.renderer(jobnames);
 	}
 }

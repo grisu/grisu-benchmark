@@ -6,138 +6,178 @@ import grisu.frontend.model.job.JobObject;
 import grisu.model.GrisuRegistryManager;
 import grisu.model.UserEnvironmentManager;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-public class BenchmarkJob
-{
+import au.com.bytecode.opencsv.CSVReader;
+
+public class BenchmarkJob {
 	private static final int waittime = 10;
 	private final ServiceInterface si;
 	private Boolean nowait;
 	private final String jobname;
 	private int minCpus;
 	private Long minRunTime;
-	private Map<JobObject, Long> jobs = new HashMap<JobObject, Long>();
-	
+	// private Map<JobObject, Long> jobs = new HashMap<JobObject, Long>();
+	// private Map<JobDetailsVO, Long> jobs = new HashMap<JobDetailsVO, Long>();
+	private List<JobDetailsVO> jobs = new ArrayList<JobDetailsVO>();
+	private List<String> jList = new ArrayList<String>();
+	private List<String[]> csvReadList;
+
 	public BenchmarkJob(ServiceInterface si, String jobname, Boolean nowait) {
 		this.si = si;
 		this.jobname = jobname;
-		this.nowait=nowait;
-		minCpus=9999;
+		this.nowait = nowait;
+		minCpus = 9999;
 		init();
-		jobs=sort();
-	}
+		// jobs=sort();
 
-	
-	private void init() 
-	{
-		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si).getUserEnvironmentManager();
-		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);	
+		Collections.sort(jobs, new Comparator<JobDetailsVO>() {
 
-		Long totalExecTime=0L;
-		Boolean jobsInProgress=true;
-
-		while(jobsInProgress)
-		{
-			jobsInProgress=false;
-			for(String jname:currentJobList)
-			{
-				if(jname.contains(jobname))
-				{
-					System.out.println("Checking job: "+jname);
-					try 
-					{
-						JobObject job = new JobObject(si, jname);
-						if(!job.isFinished())
-						{
-							System.out.println("\tNot finished.");
-							if ( !nowait) {
-								jobsInProgress=true;
-							}
-						}
-						else
-						{
-							System.out.println("\tFinished.");
-							if(!jobs.containsKey(job))
-							{
-								Integer cpus=job.getCpus();
-								try
-								{
-									totalExecTime=getExecutionTime(job);
-									if ( cpus < minCpus ) 
-									{
-										minCpus = cpus;
-										minRunTime = totalExecTime;
-									}
-									jobs.put(job, totalExecTime);
-								}
-								catch(Exception e)
-								{
-									System.out.println("job failed");
-									jobs.put(job, null);
-								}
-							}
-						}
-					} catch (NoSuchJobException e) {
-						e.printStackTrace();
-					}
-					catch (NullPointerException e) {
-					}
-				}
-			}
-			// wait a few seconds, so we don't overload the backend
-			if ( jobsInProgress ) {
-				try {
-					Thread.sleep(waittime*1000);
-				} catch (InterruptedException e) {
-				}
-			}
-
-		}		
-	}
-
-	//Calculate the execution time for a job from the logs in benchmark.log
-	private static Long getExecutionTime(JobObject job) throws Exception 
-	{
-		String jobLog=job.getFileContent("benchmark.log");
-		String holder=jobLog.substring(jobLog.lastIndexOf("Started:"));
-		Long long1=Long.parseLong(holder.substring(9,holder.indexOf("\n")));
-		holder=jobLog.substring(jobLog.lastIndexOf("Finished:"));
-		Long long2=Long.parseLong(holder.substring(10,holder.indexOf("\n")));
-
-		System.out.println("Time taken for execution:"+(long2-long1));
-
-		return (long2-long1);
-	}
-
-	//sort the list of jobs in ascending order of the number of CPUs
-	public Map<JobObject, Long> sort()
-	{
-		ArrayList<JobObject> jobSet=new ArrayList<JobObject>(jobs.keySet());
-		Collections.sort(jobSet, new Comparator<JobObject>(){
-			public int compare(JobObject j1, JobObject j2)
-			{
-				return (j1.getCpus()-j2.getCpus());
+			@Override
+			public int compare(JobDetailsVO j1, JobDetailsVO j2) {
+				// TODO Auto-generated method stub
+				return (j1.getCpus() - j2.getCpus());
 			}
 		});
-
-		Iterator<JobObject> it=jobSet.iterator();
-		Map<JobObject, Long> sortedMap=new LinkedHashMap<JobObject, Long>();
-		JobObject jo;
-		while(it.hasNext())
-		{
-			jo=it.next();
-			sortedMap.put(jo, jobs.get(jo));
-		}
-		return sortedMap;
 	}
 
+	private void init() {
+		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si)
+				.getUserEnvironmentManager();
+		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
+
+		Long totalExecTime = 0L;
+		Boolean jobsInProgress = true;
+
+		if (jobname.endsWith(".csv")) {
+			try {
+				CSVReader reader = new CSVReader(new FileReader(jobname));
+				csvReadList = reader.readAll();
+				String[] jobDets;
+				for (int i = 1; i < csvReadList.size(); i++) {
+					jobDets = csvReadList.get(i);
+
+					JobDetailsVO jDetails = new JobDetailsVO();
+					jDetails.setJobName(jobDets[0]);
+					jDetails.setHostCount(Integer.parseInt(jobDets[1]));
+					jDetails.setStatus(Boolean.parseBoolean(jobDets[2]));
+					jDetails.setCpus(Integer.parseInt(jobDets[3]));
+					jDetails.setWallTime(Integer.parseInt(jobDets[4]));
+					if (jobDets[5].length() > 0) {
+						jDetails.setExecutionTime(Long.parseLong(jobDets[5]));
+						jDetails.setTotalExecutionTime(Long.parseLong(jobDets[6]));
+						jDetails.setEfficiency(Double.parseDouble(jobDets[7]));
+					}
+					jobs.add(jDetails);
+				}
+
+			} catch (FileNotFoundException e) {
+				// e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			while (jobsInProgress) {
+				jobsInProgress = false;
+				for (String jname : currentJobList) {
+					if (jname.contains(jobname)) {
+						System.out.println("Checking job: " + jname);
+						try {
+							JobObject job = new JobObject(si, jname);
+							if (!job.isFinished()) {
+								System.out.println("\tNot finished.");
+								if (!nowait) {
+									jobsInProgress = true;
+								}
+							} else {
+								System.out.println("\tFinished.");
+								if (!jList.contains(jname)) {
+									Integer cpus = job.getCpus();
+
+									JobDetailsVO jDetails = new JobDetailsVO();
+									jDetails.setJobName(jname);
+									jDetails.setHostCount(job.getHostCount());
+									jDetails.setStatus(job.isSuccessful(true));
+									jDetails.setWallTime(job
+											.getWalltimeInSeconds());
+									jDetails.setCpus(cpus);
+
+									try {
+										totalExecTime = getExecutionTime(job);
+										if (cpus < minCpus) {
+											minCpus = cpus;
+											minRunTime = totalExecTime;
+										}
+
+										jDetails.setExecutionTime(totalExecTime);
+										jDetails.setTotalExecutionTime(totalExecTime
+												* cpus);
+										// jobs.put(jDetails, totalExecTime);
+										// jobs.add(jDetails);
+									} catch (Exception e) {
+										System.out.println("job failed");
+										// jobs.add(jDetails);
+									}
+									jobs.add(jDetails);
+									jList.add(jname);
+								}
+							}
+						} catch (NoSuchJobException e) {
+							e.printStackTrace();
+						} catch (NullPointerException e) {
+						}
+					}
+				}
+				// wait a few seconds, so we don't overload the backend
+				if (jobsInProgress) {
+					try {
+						Thread.sleep(waittime * 1000);
+					} catch (InterruptedException e) {
+					}
+				}
+
+			}
+		}
+	}
+
+	// Calculate the execution time for a job from the logs in benchmark.log
+	private static Long getExecutionTime(JobObject job) throws Exception {
+		String jobLog = job.getFileContent("benchmark.log");
+		String holder = jobLog.substring(jobLog.lastIndexOf("Started:"));
+		Long long1 = Long.parseLong(holder.substring(9, holder.indexOf("\n")));
+		holder = jobLog.substring(jobLog.lastIndexOf("Finished:"));
+		Long long2 = Long.parseLong(holder.substring(10, holder.indexOf("\n")));
+
+		System.out.println("Time taken for execution:" + (long2 - long1));
+
+		return (long2 - long1);
+	}
+
+	/**
+	 * //sort the list of jobs in ascending order of the number of CPUs public
+	 * Map<JobDetailsVO, Long> sort() { ArrayList<JobDetailsVO> jobSet=new
+	 * ArrayList<JobDetailsVO>(jobs.keySet()); Collections.sort(jobSet, new
+	 * Comparator<JobDetailsVO>(){ public int compare(JobDetailsVO j1,
+	 * JobDetailsVO j2) { return (j1.getCpus()-j2.getCpus()); } });
+	 * 
+	 * Iterator<JobDetailsVO> it=jobSet.iterator(); //Map<JobObject, Long>
+	 * sortedMap=new LinkedHashMap<JobObject, Long>(); Map<JobDetailsVO, Long>
+	 * sortedMap=new LinkedHashMap<JobDetailsVO, Long>(); JobDetailsVO jo;
+	 * while(it.hasNext()) { jo=it.next(); sortedMap.put(jo, jobs.get(jo)); }
+	 * return sortedMap; }
+	 **/
 
 	public void setMinRunTime(Long minRunTime) {
 		this.minRunTime = minRunTime;
@@ -146,7 +186,7 @@ public class BenchmarkJob
 	public int getMinCpus() {
 		return minCpus;
 	}
-	
+
 	public void setMinCpus(int minCpus) {
 		this.minCpus = minCpus;
 	}
@@ -154,13 +194,12 @@ public class BenchmarkJob
 	public Long getMinRunTime() {
 		return minRunTime;
 	}
-	
-	public Map<JobObject, Long> getJobs() 
-	{
+
+	public List<JobDetailsVO> getJobs() {
 		return jobs;
 	}
 
-	public void setJobs(Map<JobObject, Long> jobs) {
+	public void setJobs(List<JobDetailsVO> jobs) {
 		this.jobs = jobs;
 	}
 
