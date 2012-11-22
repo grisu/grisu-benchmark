@@ -10,6 +10,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 
+	//create a csv file from the data for the benchmark job
 	@Override
 	public void renderer(BenchmarkJob bJob) {
 

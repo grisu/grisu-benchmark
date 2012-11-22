@@ -18,7 +18,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 
 	public HtmlBenchmarkRenderer() {
 
-		// StringBuffer
+		// holds the content for the html file to be created
 		htmlString = new StringBuffer(
 				"<html>"
 						+ "\n<head>"
@@ -37,18 +37,20 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 						+ "hAxis: {title: \"Number of CPUs used for the job\"}"
 						+ "\n};");
 
-		// StringBuffer
+		// holds the table tags for printing out all the values for each benchmark job specified
 		tableString = new StringBuffer(
 
 		);
 
-		// StringBuffer
+		// holds the string for the graph drawing related data for each job
 		effGraphString = new StringBuffer();
+		//holds the graph placements related data for each job 
 		htmlBodyString = new StringBuffer("<table>");
 	}
 
 	@Override
 	// public void renderer(List<String> jobnames) {
+	//populate all the html file related strings for the specified benchmark job
 	public void renderer(BenchmarkJob bJob) {
 
 		Long executionTime;
@@ -139,6 +141,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		return Double.valueOf(df.format(d));
 	}
 
+	//create the html file for all the job data collected above
 	public void populateGraph(StringBuffer graphname) {
 		htmlBodyString.append("</table>");
 		htmlString.append("" + effGraphString + "\n}" + "\n</script>"

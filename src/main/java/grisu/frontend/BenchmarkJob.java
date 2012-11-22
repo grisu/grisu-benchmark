@@ -25,7 +25,7 @@ public class BenchmarkJob {
 	private static final int waittime = 10;
 	private final ServiceInterface si;
 	private Boolean nowait;
-	private final String jobname;
+	private String jobname;
 	private int minCpus;
 	private Long minRunTime;
 	// private Map<JobObject, Long> jobs = new HashMap<JobObject, Long>();
@@ -60,6 +60,7 @@ public class BenchmarkJob {
 		Long totalExecTime = 0L;
 		Boolean jobsInProgress = true;
 
+		//if jobname specified at the command line is a csv file, populate the jobs list from this csv file
 		if (jobname.endsWith(".csv")) {
 			try {
 				CSVReader reader = new CSVReader(new FileReader(jobname));
@@ -88,7 +89,9 @@ public class BenchmarkJob {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else {
+		} 
+		//if the job name specified is not a csv file, find out the details of each job in that benchmark
+		else {
 			while (jobsInProgress) {
 				jobsInProgress = false;
 				for (String jname : currentJobList) {
@@ -205,6 +208,10 @@ public class BenchmarkJob {
 
 	public String getJobname() {
 		return jobname;
+	}
+	
+	public void setJobname(String jobname) {
+		this.jobname=jobname;
 	}
 
 }

@@ -133,14 +133,19 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		for (int i = 0; i < jobnames.size(); i++) {
 			// for --jobname option
 			BenchmarkJob bJob = new BenchmarkJob(si, jobnames.get(i), nowait);
+			
 			if(!jobnames.get(i).endsWith(".csv"))
 			{
 				CsvBenchmarkRenderer csv = new CsvBenchmarkRenderer();
 				csv.renderer(bJob);
 			}
+			else //if the filename (jobname) is a path, set the jobname as the actual filename in the bjob 
+			{ 	 //(after the actual path has been used in the BenchmarkJob constructor above)
+				bJob.setJobname(FileManager.getFilename(bJob.getJobname()));
+			}
 			
 			html.renderer(bJob);
-			concatJobnames.append(jobnames.get(i)+"_");
+			concatJobnames.append(bJob.getJobname()+"_");
 		}
 		
 		html.populateGraph(concatJobnames);
