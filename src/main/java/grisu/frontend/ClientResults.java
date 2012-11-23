@@ -70,10 +70,19 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		boolean nowait = getCliParameters().getNowait();
 
 		boolean list = getCliParameters().getList();
+		
+		String graph = getCliParameters().getGraph();
 
 		if (jobnames == null && !list)
 			System.out
 					.println("Please specify a job name or use the --list option");
+		
+		if(graph==null || (!graph.equalsIgnoreCase("line") && !graph.equalsIgnoreCase("column")))
+		{
+			System.out.println("Setting default graph type to Line");
+			graph="Line";
+		}
+		
 		System.out.println("Getting serviceinterface...");
 		ServiceInterface si = null;
 		try {
@@ -150,8 +159,12 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		
 		if(concatJobnames.length()>200)
 			concatJobnames=new StringBuffer(concatJobnames.substring(0, 200));
-		html.populateGraph(concatJobnames);
-	
+		
+		if(graph.equalsIgnoreCase("column"))
+			html.populateGraph(concatJobnames, "ColumnChart");
+		else
+			html.populateGraph(concatJobnames, "LineChart");
+		
 	//	HtmlBenchmarkRenderer html = new HtmlBenchmarkRenderer();
 	//	html.renderer(jobnames);
 	}

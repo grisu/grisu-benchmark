@@ -27,4 +27,9 @@ public class ClientResultsParams extends GrisuCliParameters {
 		return list;
 	}
 
+	@Parameter(names = { "--graph"}, description = "specifies the type of graph (line or column) to be displayed for comparing the jobs in the jobnames list")
+	private String graph;
+	public String getGraph() {
+		return graph;
+	}
 }
