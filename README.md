@@ -100,7 +100,7 @@ An HTML file showing a graph of the execution time, per cpu execution time and e
 _--list_ (optional): 
 the list option if specified, lists down all the current benchmark jobs along with the total number of jobs, number of finished jobs and the number of jobs which are still in progress for each benchmark job
 
-_-n_ or _--jobname_ (required if --list option not used)
+_-n_ or _--jobname_ (required if --list option not used): 
 specifies a series of benchmark-job names, as a comma separated list, whose results need to be obtained
 
 _--no-wait_ (optional): 
