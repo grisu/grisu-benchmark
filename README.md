@@ -94,3 +94,18 @@ allows to set additional environment variables for a job, something like:
 The details of all finished jobs can be viewed, by giving the corresponding job name as a command line argument.
 The details like job name, host count, status, number of CPUs used, wall time, total execution time, average execution time per CPU and efficiency are logged in a newly created csv file having the job's name.
 An HTML file showing a graph of the execution time, per cpu execution time and efficiency against the number of CPUs is also created.
+
+##### Available commandline parameters for gathering benchmark results
+
+_--list_ (optional)
+the list option if specified, lists down all the current benchmark jobs along with the total number of jobs, number of finished jobs and the number of jobs which are still in progress for each benchmark job
+
+_-n_ or _--jobname_ (required if --list option not used)
+specifies a series of benchmark-job names, as a comma separated list, whose results need to be obtained
+
+_--no-wait_ (optional)
+if specified, it does not wait for all the jobs to finish before populating the final results for the specified benchmark jobs
+
+--graph (optional)
+specifies the type of graph/chart (line or column) to be used to display the combined results for all the jobs in the list specified
+
