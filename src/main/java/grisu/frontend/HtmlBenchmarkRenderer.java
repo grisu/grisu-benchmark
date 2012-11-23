@@ -1,7 +1,5 @@
 package grisu.frontend;
 
-import grisu.frontend.model.job.JobObject;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,16 +16,17 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 	private StringBuffer effGraphString;
 	private StringBuffer htmlBodyString;
 	static int benchmarkCount;
-	private List<Integer> xVals=new ArrayList<Integer>();
-	private Map<Integer, HashMap<Integer, Long>> execTimeVals=new HashMap<Integer, HashMap<Integer,Long>>();
-	private Map<Integer, HashMap<Integer, Double>> effVals=new HashMap<Integer, HashMap<Integer,Double>>();
-	private Map<Integer, HashMap<Integer, Long>> totExecTimeVals=new HashMap<Integer, HashMap<Integer,Long>>();
+
+	private List<Integer> cpuVals = new ArrayList<Integer>();
+	private Map<Integer, HashMap<Integer, Long>> execTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
+	private Map<Integer, HashMap<Integer, Double>> effVals = new HashMap<Integer, HashMap<Integer, Double>>();
+	private Map<Integer, HashMap<Integer, Long>> totExecTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
 
 	public HtmlBenchmarkRenderer() {
 
 		// holds the content for the html file to be created
 		htmlString = new StringBuffer(
-				"<html>"
+						"<html>"
 						+ "\n<head>"
 						+ "\n<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
 						+ "\n<script type=\"text/javascript\">"
@@ -49,15 +48,15 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 
 		// holds the string for the graph drawing related data for each job
 		effGraphString = new StringBuffer();
-		//holds the graph placements related data for each job 
+		
+		// holds the graph placements related data for each job
 		htmlBodyString = new StringBuffer("<table>");
 	}
 
+	// populate all the html file related strings for the specified benchmark job
 	@Override
-	// public void renderer(List<String> jobnames) {
-	//populate all the html file related strings for the specified benchmark job
-	public void renderer(BenchmarkJob bJob) {
-
+	public void renderer(BenchmarkJob bJob) 
+	{
 		Long executionTime;
 		Long totalExecutionTime;
 		String[] jobValues = new String[10];
@@ -81,7 +80,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		HashMap<Integer, Long> tempMap = new HashMap<Integer, Long>();
 		HashMap<Integer, Double> tempMap2 = new HashMap<Integer, Double>();
 		HashMap<Integer, Long> tempMap3 = new HashMap<Integer, Long>();
-		
+
 		for (JobDetailsVO job : bJob.getJobs()) {
 			jobValues[0] = job.getJobName();
 			jobValues[1] = "" + job.getHostCount();
@@ -91,9 +90,9 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 			jobValues[3] = "" + cpus;
 			jobValues[4] = "" + job.getWallTime();
 
-			// executionTime = bJob.getJobs().get(job);
 			executionTime = job.getExecutionTime();
-			if (executionTime != null) {
+			if (executionTime != null) 
+			{
 				jobValues[5] = "" + executionTime;
 
 				totalExecutionTime = job.getTotalExecutionTime();
@@ -119,20 +118,18 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 						+ trimDouble(totalExecutionTime)
 						+ "</td><td align=\"right\"> " + trimDouble(efficiency)
 						+ "</td></tr>");
-				
-				if(benchmarkCount==0)
-				{
-					if(!xVals.contains(cpus))
-					{
-						xVals.add(cpus);
+
+				if (benchmarkCount == 0) {
+					if (!cpuVals.contains(cpus)) {
+						cpuVals.add(cpus);
 						tempMap.put(cpus, executionTime);
 						tempMap2.put(cpus, efficiency);
 						tempMap3.put(cpus, totalExecutionTime);
 					}
-				}
-				else
+				} 
+				else 
 				{
-					if(xVals.contains(cpus))
+					if (cpuVals.contains(cpus)) 
 					{
 						tempMap.put(cpus, executionTime);
 						tempMap2.put(cpus, efficiency);
@@ -140,33 +137,26 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 					}
 				}
 			}
-			
-
-			
 		}
 		execTimeVals.put(benchmarkCount, tempMap);
 		effVals.put(benchmarkCount, tempMap2);
 		totExecTimeVals.put(benchmarkCount, tempMap3);
 
-		htmlString
-				.append("\n]);"
+		htmlString.append("\n]);"
 						+ "\nvar chart = new google.visualization.LineChart(document.getElementById('chart_div"
 						+ benchmarkCount + "'));"
 						+ "\nchart.draw(data, options);");
-		effGraphString
-				.append("\n]);"
+		effGraphString.append("\n]);"
 						+ "\nvar effchart = new google.visualization.LineChart(document.getElementById('effchart_div"
 						+ benchmarkCount + "'));"
 						+ "\neffchart.draw(effdata, effoptions);");
 
-		htmlBodyString.append(
-				"<tr><td>"+bJob.getJobname()+"</td></tr>"
-				+"<tr><td><div id=\"chart_div" + benchmarkCount
+		htmlBodyString.append("<tr><td>" + bJob.getJobname() + "</td></tr>"
+				+ "<tr><td><div id=\"chart_div" + benchmarkCount
 				+ "\" style=\"width: 900px; height: 500px;\"></div></td>"
 				+ "<td><div id=\"effchart_div" + benchmarkCount
-				+ "\" style=\"width: 900px; height: 500px;\"></div></td></tr>"
-				);
-		
+				+ "\" style=\"width: 900px; height: 500px;\"></div></td></tr>");
+
 		tableString.append("</table>");
 		benchmarkCount++;
 	}
@@ -176,107 +166,96 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		return Double.valueOf(df.format(d));
 	}
 
-	//create the html file for all the job data collected above
-	public void populateGraph(StringBuffer graphname, String chartType) {
-		
-		
-		StringBuffer combinedGraphString = new StringBuffer(" var data = google.visualization.arrayToDataTable(["
-			                                                   +"\n['CPUs'");
-		StringBuffer combinedGraphString2 = new StringBuffer(" var data = google.visualization.arrayToDataTable(["
-																+"\n['CPUs'");
-		StringBuffer combinedGraphString3 = new StringBuffer(" var data = google.visualization.arrayToDataTable(["
-                +"\n['CPUs'");
-		
-		for(int i=0;i<benchmarkCount;i++)
+	// create the html file for all the job data collected above
+	public void populateGraph(StringBuffer graphname, String chartType) 
+	{
+		String varDataDeclaration=" var data = google.visualization.arrayToDataTable(["
+				+ "\n['CPUs'";
+		StringBuffer combinedGraphString = new StringBuffer(varDataDeclaration);
+		StringBuffer combinedGraphString2 = new StringBuffer(varDataDeclaration);
+		StringBuffer combinedGraphString3 = new StringBuffer(varDataDeclaration);
+
+		for (int i = 0; i < benchmarkCount; i++) 
 		{
-			combinedGraphString.append(", 'Job "+i+"'");
-			combinedGraphString2.append(", 'Job "+i+"'");
-			combinedGraphString3.append(", 'Job "+i+"'");
+			combinedGraphString.append(", 'Job " + i + "'");
+			combinedGraphString2.append(", 'Job " + i + "'");
+			combinedGraphString3.append(", 'Job " + i + "'");
 		}
 		combinedGraphString.append("]");
 		combinedGraphString2.append("]");
 		combinedGraphString3.append("]");
-		
+
 		int cpuVal;
 		Long execTimeVal;
 		Long totExecTimeVal;
 		double effVal;
-		for(int cpuIndex=0;cpuIndex<xVals.size();cpuIndex++)
+		for (int cpuIndex = 0; cpuIndex < cpuVals.size(); cpuIndex++) 
 		{
-			cpuVal=xVals.get(cpuIndex);
-			combinedGraphString.append(",\n[ '"+cpuVal+"'");
-			combinedGraphString2.append(",\n[ '"+cpuVal+"'");
-			combinedGraphString3.append(",\n[ '"+cpuVal+"'");
-			for(int jobIndex=0;jobIndex<benchmarkCount;jobIndex++)
+			cpuVal = cpuVals.get(cpuIndex);
+			combinedGraphString.append(",\n[ '" + cpuVal + "'");
+			combinedGraphString2.append(",\n[ '" + cpuVal + "'");
+			combinedGraphString3.append(",\n[ '" + cpuVal + "'");
+		
+			for (int jobIndex = 0; jobIndex < benchmarkCount; jobIndex++) 
 			{
-				try{
-				execTimeVal=execTimeVals.get(jobIndex).get(cpuVal);
-				effVal=effVals.get(jobIndex).get(cpuVal);
-				totExecTimeVal=totExecTimeVals.get(jobIndex).get(cpuVal);
-				combinedGraphString.append(", "+execTimeVal);
-				combinedGraphString2.append(", "+effVal);
-				combinedGraphString3.append(", "+totExecTimeVal);
-				}
-				catch(NullPointerException e)
+				try 
+				{
+					execTimeVal = execTimeVals.get(jobIndex).get(cpuVal);
+					effVal = effVals.get(jobIndex).get(cpuVal);
+					totExecTimeVal = totExecTimeVals.get(jobIndex).get(cpuVal);
+					combinedGraphString.append(", " + execTimeVal);
+					combinedGraphString2.append(", " + effVal);
+					combinedGraphString3.append(", " + totExecTimeVal);
+				} catch (NullPointerException e) 
 				{
 					combinedGraphString.append(", 0");
 					combinedGraphString2.append(", 0");
 					combinedGraphString3.append(", 0");
 				}
-				
+
 			}
 			combinedGraphString.append("]");
 			combinedGraphString2.append("]");
 			combinedGraphString3.append("]");
 		}
-		
-		combinedGraphString.append("\n]);"
-				+ "\nvar options = {"
+
+		combinedGraphString.append("\n]);" + "\nvar options = {"
 				+ "\ntitle: 'Execution Time for each benchmark job',"
 				+ "axisTitlesPosition: 'out',"
 				+ "hAxis: {title: \"Number of CPUs used for the job\"}"
-				+ "\n};"
-				+ "\nvar chart = new google.visualization."+chartType+"(document.getElementById('chart_combi_div'));"
+				+ "\n};" + "\nvar chart = new google.visualization."
+				+ chartType + "(document.getElementById('chart_combi_div'));"
 				+ "\nchart.draw(data, options);");
-		
+
 		combinedGraphString2.append("\n]);"
-				+ "\nvar options = {"
-				+ "\ntitle: 'Total Execution Time across all CPUs for each benchmark job',"
-				+ "axisTitlesPosition: 'out',"
-				+ "hAxis: {title: \"Number of CPUs used for the job\"}"
-				+ "\n};"
-				+ "\nvar chart = new google.visualization."+chartType+"(document.getElementById('effchart_combi_div'));"
-				+ "\nchart.draw(data, options);");
-		
-		combinedGraphString3.append("\n]);"
-				+ "\nvar effoptions = {"
+						+ "\nvar options = {"
+						+ "\ntitle: 'Total Execution Time across all CPUs for each benchmark job',"
+						+ "axisTitlesPosition: 'out',"
+						+ "hAxis: {title: \"Number of CPUs used for the job\"}"
+						+ "\n};" + "\nvar chart = new google.visualization."
+						+ chartType
+						+ "(document.getElementById('effchart_combi_div'));"
+						+ "\nchart.draw(data, options);");
+
+		combinedGraphString3.append("\n]);" + "\nvar effoptions = {"
 				+ "\ntitle: 'CPUs v/s Efficiency for each benchmak jobs',"
 				+ "axisTitlesPosition: 'out',"
 				+ "hAxis: {title: \"Number of CPUs used for the job\"}"
-				+ "\n};"
-				+ "\nvar chart = new google.visualization."+chartType+"(document.getElementById('chart_combi_div2'));"
+				+ "\n};" + "\nvar chart = new google.visualization."
+				+ chartType + "(document.getElementById('chart_combi_div2'));"
 				+ "\nchart.draw(data, effoptions);");
 
-
-		htmlBodyString.append(
-				"<tr><td>combined chart</td></tr>"
-				+"<tr><td><div id=\"chart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td>"
-				+"<td><div id=\"chart_combi_div2\" style=\"width: 900px; height: 500px;\"></div></td>"
-				+"<td><div id=\"effchart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td></tr>"
-				);
-		htmlBodyString.append("</table>");
-		htmlString.append("" + effGraphString 
-				+combinedGraphString
-				+combinedGraphString2
-				+combinedGraphString3
-				 + "\n}"
-				+"\n</script>"
-				+ "\n</head>" + "\n<body>" 
-				+ htmlBodyString 
-				+ tableString
-				+ "\n</body>" 
-				+ "\n</html>");
+		htmlBodyString.append("<tr><td>combined chart</td></tr>"
+						+ "<tr><td><div id=\"chart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td>"
+						+ "<td><div id=\"chart_combi_div2\" style=\"width: 900px; height: 500px;\"></div></td>"
+						+ "<td><div id=\"effchart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td></tr>"
+						+"</table>");
 		
+		htmlString.append("" + effGraphString + combinedGraphString
+				+ combinedGraphString2 + combinedGraphString3 + "\n}"
+				+ "\n</script>" + "\n</head>" + "\n<body>" + htmlBodyString
+				+ tableString + "\n</body>" + "\n</html>");
+
 		BufferedWriter out;
 		try {
 			out = new BufferedWriter(new FileWriter(graphname + "graph.html"));
