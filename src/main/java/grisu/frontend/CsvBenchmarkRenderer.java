@@ -17,6 +17,7 @@ public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 		CSVWriter writer = null;
 		CSVWriter errWriter = null;
 		String[] jobValues = new String[10];
+		jobValues[0] = "Job name";
 		jobValues[1] = "Host count";
 		jobValues[2] = "Job success status";
 		jobValues[3] = "CPUs";
@@ -31,7 +32,6 @@ public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 					+ "_err.csv"));
 			writer.writeNext(jobValues);
 			jobValues[5] = jobValues[6] = jobValues[7] = null;
-			jobValues[0] = "Job name";
 			errWriter.writeNext(jobValues);
 
 		} catch (IOException e) {
