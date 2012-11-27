@@ -52,7 +52,11 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		effGraphString = new StringBuffer();
 
 		// holds the graph placements related data for each job
-		htmlBodyString = new StringBuffer("<table>");
+		htmlBodyString = new StringBuffer("<table>"
+				+"<tr><td>combined chart</td></tr>"
+				+ "<tr><td><div id=\"chart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td>"
+				+ "<td><div id=\"chart_combi_div2\" style=\"width: 900px; height: 500px;\"></div></td>"
+				+ "<td><div id=\"effchart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td></tr>");
 	}
 
 	// populate all the html file related strings for the specified benchmark
@@ -225,7 +229,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		combinedGraphString2
 				.append("\n]);"
 						+ "\nvar options = {"
-						+ "\ntitle: 'Total Execution Time across all CPUs for each benchmark job',"
+						+ "\ntitle: 'CPUs v/s Efficiency for each benchmak jobs',"
 						+ "axisTitlesPosition: 'out',"
 						+ "hAxis: {title: \"Number of CPUs used for the job\"}"
 						+ "\n};" + "\nvar chart = new google.visualization."
@@ -234,22 +238,24 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 						+ "\nchart.draw(data, options);");
 
 		combinedGraphString3.append("\n]);" + "\nvar effoptions = {"
-				+ "\ntitle: 'CPUs v/s Efficiency for each benchmak jobs',"
+				+ "\ntitle: 'Total Execution Time across all CPUs for each benchmark job',"
 				+ "axisTitlesPosition: 'out',"
 				+ "hAxis: {title: \"Number of CPUs used for the job\"}"
 				+ "\n};" + "\nvar chart = new google.visualization."
 				+ chartType + "(document.getElementById('chart_combi_div2'));"
 				+ "\nchart.draw(data, effoptions);");
 
-		htmlBodyString
-				.append("<tr><td>combined chart</td></tr>"
-						+ "<tr><td><div id=\"chart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td>"
-						+ "<td><div id=\"chart_combi_div2\" style=\"width: 900px; height: 500px;\"></div></td>"
-						+ "<td><div id=\"effchart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td></tr>"
-						+ "</table>");
+//		htmlBodyString
+//				.append("<tr><td>combined chart</td></tr>"
+//						+ "<tr><td><div id=\"chart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td>"
+//						+ "<td><div id=\"chart_combi_div2\" style=\"width: 900px; height: 500px;\"></div></td>"
+//						+ "<td><div id=\"effchart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td></tr>"
+//						+ "</table>");
+
+		htmlBodyString.append("</table>");
 
 		htmlString.append("" + effGraphString + combinedGraphString
-				+ combinedGraphString2 + combinedGraphString3 + "\n}"
+				+ combinedGraphString3 + combinedGraphString2 + "\n}"
 				+ "\n</script>" + "\n</head>" + "\n<body>" + htmlBodyString
 				+ tableString + "\n</body>" + "\n</html>");
 
