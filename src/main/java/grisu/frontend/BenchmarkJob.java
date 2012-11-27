@@ -95,7 +95,9 @@ public class BenchmarkJob {
 			while (jobsInProgress) {
 				jobsInProgress = false;
 				for (String jname : currentJobList) {
-					if (jname.contains(jobname)) {
+					String rex = jobname+"_\\d\\d\\d\\d_cpus_.*";
+					if (jname.matches(rex)) {
+//					if (jname.contains(jobname)) {
 						System.out.println("Checking job: " + jname);
 						try {
 							JobObject job = new JobObject(si, jname);
