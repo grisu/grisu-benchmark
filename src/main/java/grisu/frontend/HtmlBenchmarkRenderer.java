@@ -21,6 +21,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 	private Map<Integer, HashMap<Integer, Long>> execTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
 	private Map<Integer, HashMap<Integer, Double>> effVals = new HashMap<Integer, HashMap<Integer, Double>>();
 	private Map<Integer, HashMap<Integer, Long>> totExecTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
+	String[] jobNameList=new String[10];
 
 	public HtmlBenchmarkRenderer() {
 
@@ -158,6 +159,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 				+ "\" style=\"width: 900px; height: 500px;\"></div></td></tr>");
 
 		tableString.append("</table>");
+		jobNameList[benchmarkCount]=bJob.getJobname();
 		benchmarkCount++;
 	}
 
@@ -175,9 +177,9 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		StringBuffer combinedGraphString3 = new StringBuffer(varDataDeclaration);
 
 		for (int i = 0; i < benchmarkCount; i++) {
-			combinedGraphString.append(", 'Job " + i + "'");
-			combinedGraphString2.append(", 'Job " + i + "'");
-			combinedGraphString3.append(", 'Job " + i + "'");
+			combinedGraphString.append(", '" + jobNameList[i] + "'");
+			combinedGraphString2.append(", '" + jobNameList[i] + "'");
+			combinedGraphString3.append(", '" + jobNameList[i] + "'");
 		}
 		combinedGraphString.append("]");
 		combinedGraphString2.append("]");
