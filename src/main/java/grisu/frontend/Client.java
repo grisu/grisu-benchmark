@@ -126,6 +126,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 
 			job.setApplication(Constants.GENERIC_APPLICATION_NAME);
 			job.setCommandline("sh " + scriptName + " " + args);
+			
 			System.out.println("commandline:" + job.getCommandline());
 			job.addInputFileUrl(script);
 			if (files != null) {
@@ -133,7 +134,9 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 				for (int j = 0; j < filename.length; j++) {
 					job.addInputFileUrl(filename[j]);
 				}
+		//		job.setCommandline("cat "+filename[0]);
 			}
+			
 			try {
 				job.setWalltimeInSeconds(WalltimeUtils
 						.fromShortStringToSeconds(wallTime));

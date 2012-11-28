@@ -50,13 +50,22 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		// holds the table tags for printing out all the values for each
 		// benchmark job specified
 		tableString = new StringBuffer();
-
+//print baseline - min cpus, min totalexectime
 		// holds the string for the graph drawing related data for each job
 		effGraphString = new StringBuffer();
 
 		// holds the graph placements related data for each job
 		htmlBodyString = new StringBuffer("<table>"
+//				+"<table>"
 				+"<tr><td>combined chart</td></tr>"
+				+"<tr><td align=\"right\">Minimum Number of CPUs across all the benchmark jobs : "
+				//+minCpu
+				+"</td><td align=\"left\"><div id='mincpudisp'></div></td></tr>"
+				+"<tr><td align=\"right\">Runtime for the job with minimum number of CPUs : "
+				//+minRuntime
+				//+"</td></tr>" 
+//				+"</table>"
+				+"</td><td align=\"left\"><div id='minrtdisp'></div></td></tr>"
 				+ "<tr><td><div id=\"chart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td>"
 				+ "<td><div id=\"chart_combi_div2\" style=\"width: 900px; height: 500px;\"></div></td>"
 				+ "<td><div id=\"effchart_combi_div\" style=\"width: 900px; height: 500px;\"></div></td></tr>");
@@ -70,6 +79,9 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		Long totalExecutionTime;
 		String[] jobValues = new String[10];
 		int cpus;
+		int jobMinCpu=0;
+		Long jobMinRuntime=0L;
+		String bJobName=bJob.getJobname();
 
 		htmlString
 				.append("\nvar data = google.visualization.arrayToDataTable(["
@@ -80,7 +92,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 						+ "\n['Number of CPUs', 'Efficiency']");
 
 		tableString.append("<table border=\"1\">" + "<caption>"
-				+ bJob.getJobname() + "</caption>" + "<tr>"
+				+ bJobName + "</caption>" + "<tr>"
 				+ "<th>Number of CPUs</th >"
 				+ "<th>Execution time for the job</th>"
 				+ "<th>Total Execution time across all CPUs</th>"
@@ -108,10 +120,13 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 				jobValues[6] = "" + totalExecutionTime;
 
 				double efficiency;
-				if (bJob.getJobname().endsWith(".csv")) {
+				jobMinCpu=bJob.getMinCpus();
+				jobMinRuntime=bJob.getMinRunTime();
+				
+				if (bJobName.endsWith(".csv")) {
 					efficiency = job.getEfficiency();
 				} else {
-					efficiency = (bJob.getMinCpus() * bJob.getMinRunTime()
+					efficiency = (jobMinCpu * jobMinRuntime
 							.doubleValue()) / totalExecutionTime;
 				}
 				jobValues[7] = "" + efficiency;
@@ -159,7 +174,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 						+ benchmarkCount + "'));"
 						+ "\neffchart.draw(effdata, effoptions);");
 
-		htmlBodyString.append("<tr><td>" + bJob.getJobname() + "</td></tr>"
+		htmlBodyString.append("<tr><td>" + bJobName + "</td></tr>"
 				+ "<tr><td><div id=\"chart_div" + benchmarkCount
 				+ "\" style=\"width: 900px; height: 500px;\"></div></td>"
 				+ "<td><div id=\"effchart_div" + benchmarkCount
@@ -167,13 +182,13 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 
 		tableString.append("</table>");
 		
-		if(bJob.getMinCpus()<minCpu)
+		if((jobMinCpu<minCpu) || (jobMinCpu==minCpu && jobMinRuntime<minRuntime))
 		{
-			minCpu=bJob.getMinCpus();
-			minRuntime=bJob.getMinRunTime();
+			minCpu=jobMinCpu;
+			minRuntime=jobMinRuntime;
 		}
 		
-		jobNameList[benchmarkCount]=bJob.getJobname();
+		jobNameList[benchmarkCount]=bJobName;
 		benchmarkCount++;
 	}
 
@@ -267,8 +282,21 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 		htmlBodyString.append("</table>");
 
 		htmlString.append("" + effGraphString + combinedGraphString
-				+ combinedGraphString3 + combinedGraphString2 + "\n}"
-				+ "\n</script>" + "\n</head>" + "\n<body>" + htmlBodyString
+				+ combinedGraphString3 + combinedGraphString2 
+				+"document.getElementById('mincpudisp').innerHTML="+minCpu+";"
+				+"document.getElementById('minrtdisp').innerHTML="+minRuntime+";"
+				+ "\n}"
+//				+"\nvar mincpus="+minCpu+";"
+//				+"document.getElementById('mincpu').textcontent=document.mincpus.value"
+				+ "\n</script>" + "\n</head>" + "\n<body>" 
+//				+"<table>"
+//				+"<tr><td>combined chart</td></tr>"
+//				+"<tr><td>Minimum Number of CPUs across all the benchmark jobs : "
+//				+minCpu
+//				+"<tr><td>Runtime for the job with minimum number of CPUs : "
+//				+minRuntime
+//				+"</td></tr></table>"
+				+ htmlBodyString
 				+ tableString + "\n</body>" + "\n</html>");
 
 		BufferedWriter out;
@@ -280,5 +308,4 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 			e1.printStackTrace();
 		}
 	}
-
 }
