@@ -59,11 +59,13 @@ public class BenchmarkJob {
 
 		Long totalExecTime = 0L;
 		Boolean jobsInProgress = true;
-
+		int tempCpu;
+		Long tempRuntime;
 		//if jobname specified at the command line is a csv file, populate the jobs list from this csv file
 		if (jobname.endsWith(".csv")) {
+			CSVReader reader=null;
 			try {
-				CSVReader reader = new CSVReader(new FileReader(jobname));
+				reader = new CSVReader(new FileReader(jobname));
 				csvReadList = reader.readAll();
 				String[] jobDets;
 				for (int i = 1; i < csvReadList.size(); i++) {
@@ -73,22 +75,24 @@ public class BenchmarkJob {
 					jDetails.setJobName(jobDets[0]);
 					jDetails.setHostCount(Integer.parseInt(jobDets[1]));
 					jDetails.setStatus(Boolean.parseBoolean(jobDets[2]));
-					jDetails.setCpus(Integer.parseInt(jobDets[3]));
+					tempCpu=Integer.parseInt(jobDets[3]);
+					jDetails.setCpus(tempCpu);
 					jDetails.setWallTime(Integer.parseInt(jobDets[4]));
 					if (jobDets[5].length() > 0) {
-						jDetails.setExecutionTime(Long.parseLong(jobDets[5]));
+						tempRuntime=Long.parseLong(jobDets[5]);
+						jDetails.setExecutionTime(tempRuntime);
 						jDetails.setTotalExecutionTime(Long.parseLong(jobDets[6]));
 						jDetails.setEfficiency(Double.parseDouble(jobDets[7]));
 						
-						if(Integer.parseInt(jobDets[3])<minCpus)
+						if(tempCpu<minCpus)
 						{
-							minCpus = Integer.parseInt(jobDets[3]);
-							minRunTime = Long.parseLong(jobDets[5]);
+							minCpus = tempCpu;
+							minRunTime = tempRuntime;
 						}
 					}
 					jobs.add(jDetails);
 				}
-
+				reader.close();
 			} catch (FileNotFoundException e) {
 				// e.printStackTrace();
 			} catch (IOException e) {
