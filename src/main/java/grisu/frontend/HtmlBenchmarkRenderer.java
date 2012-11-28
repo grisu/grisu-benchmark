@@ -22,6 +22,9 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 	private Map<Integer, HashMap<Integer, Double>> effVals = new HashMap<Integer, HashMap<Integer, Double>>();
 	private Map<Integer, HashMap<Integer, Long>> totExecTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
 	String[] jobNameList=new String[10];
+	
+	private int minCpu=9999;
+	private Long minRuntime;
 
 	public HtmlBenchmarkRenderer() {
 
@@ -163,6 +166,13 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 				+ "\" style=\"width: 900px; height: 500px;\"></div></td></tr>");
 
 		tableString.append("</table>");
+		
+		if(bJob.getMinCpus()<minCpu)
+		{
+			minCpu=bJob.getMinCpus();
+			minRuntime=bJob.getMinRunTime();
+		}
+		
 		jobNameList[benchmarkCount]=bJob.getJobname();
 		benchmarkCount++;
 	}
@@ -202,8 +212,10 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 			for (int jobIndex = 0; jobIndex < benchmarkCount; jobIndex++) {
 				try {
 					execTimeVal = execTimeVals.get(jobIndex).get(cpuVal);
-					effVal = effVals.get(jobIndex).get(cpuVal);
+					//effVal = effVals.get(jobIndex).get(cpuVal);
 					totExecTimeVal = totExecTimeVals.get(jobIndex).get(cpuVal);
+					effVal= (minCpu * minRuntime
+							.doubleValue()) / totExecTimeVal;
 					combinedGraphString.append(", " + execTimeVal);
 					combinedGraphString2.append(", " + effVal);
 					combinedGraphString3.append(", " + totExecTimeVal);
@@ -217,7 +229,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 			combinedGraphString2.append("]");
 			combinedGraphString3.append("]");
 		}
-
+//total exec time, min cpu, minruntime, eff..
 		combinedGraphString.append("\n]);" + "\nvar options = {"
 				+ "\ntitle: 'Execution Time for each benchmark job',"
 				+ "axisTitlesPosition: 'out',"

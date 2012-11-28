@@ -79,6 +79,12 @@ public class BenchmarkJob {
 						jDetails.setExecutionTime(Long.parseLong(jobDets[5]));
 						jDetails.setTotalExecutionTime(Long.parseLong(jobDets[6]));
 						jDetails.setEfficiency(Double.parseDouble(jobDets[7]));
+						
+						if(Integer.parseInt(jobDets[3])<minCpus)
+						{
+							minCpus = Integer.parseInt(jobDets[3]);
+							minRunTime = Long.parseLong(jobDets[5]);
+						}
 					}
 					jobs.add(jDetails);
 				}
