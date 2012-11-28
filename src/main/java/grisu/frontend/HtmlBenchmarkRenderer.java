@@ -19,7 +19,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 
 	private List<Integer> cpuVals = new ArrayList<Integer>();
 	private Map<Integer, HashMap<Integer, Long>> execTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
-	private Map<Integer, HashMap<Integer, Double>> effVals = new HashMap<Integer, HashMap<Integer, Double>>();
+//	private Map<Integer, HashMap<Integer, Double>> effVals = new HashMap<Integer, HashMap<Integer, Double>>();
 	private Map<Integer, HashMap<Integer, Long>> totExecTimeVals = new HashMap<Integer, HashMap<Integer, Long>>();
 	String[] jobNameList=new String[10];
 	
@@ -87,7 +87,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 				+ "<th>Efficiency</th>" + "</tr>");
 
 		HashMap<Integer, Long> tempMap = new HashMap<Integer, Long>();
-		HashMap<Integer, Double> tempMap2 = new HashMap<Integer, Double>();
+	//	HashMap<Integer, Double> tempMap2 = new HashMap<Integer, Double>();
 		HashMap<Integer, Long> tempMap3 = new HashMap<Integer, Long>();
 
 		for (JobDetailsVO job : bJob.getJobs()) {
@@ -132,20 +132,20 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 					if (!cpuVals.contains(cpus)) {
 						cpuVals.add(cpus);
 						tempMap.put(cpus, executionTime);
-						tempMap2.put(cpus, efficiency);
+//						tempMap2.put(cpus, efficiency);
 						tempMap3.put(cpus, totalExecutionTime);
 					}
 				} else {
 					if (cpuVals.contains(cpus)) {
 						tempMap.put(cpus, executionTime);
-						tempMap2.put(cpus, efficiency);
+//						tempMap2.put(cpus, efficiency);
 						tempMap3.put(cpus, totalExecutionTime);
 					}
 				}
 			}
 		}
 		execTimeVals.put(benchmarkCount, tempMap);
-		effVals.put(benchmarkCount, tempMap2);
+//		effVals.put(benchmarkCount, tempMap2);
 		totExecTimeVals.put(benchmarkCount, tempMap3);
 
 		htmlString
@@ -229,7 +229,7 @@ public class HtmlBenchmarkRenderer implements BenchmarkRenderer {
 			combinedGraphString2.append("]");
 			combinedGraphString3.append("]");
 		}
-//total exec time, min cpu, minruntime, eff..
+
 		combinedGraphString.append("\n]);" + "\nvar options = {"
 				+ "\ntitle: 'Execution Time for each benchmark job',"
 				+ "axisTitlesPosition: 'out',"
