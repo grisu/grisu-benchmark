@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.SortedSet;
 
 import org.python.antlr.ast.boolopType;
+import org.python.apache.html.dom.HTMLBaseElementImpl;
+import org.python.indexer.demos.HtmlDemo;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -137,35 +139,28 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			System.exit(0);
 		}
 
-		StringBuffer concatJobnames=new StringBuffer("");
-		HtmlBenchmarkRenderer html = new HtmlBenchmarkRenderer();
-		for (int i = 0; i < jobnames.size(); i++) {
-			// for --jobname option
-			BenchmarkJob bJob = new BenchmarkJob(si, jobnames.get(i), nowait);
-			
-			if(!jobnames.get(i).endsWith(".csv"))
-			{
-				CsvBenchmarkRenderer csv = new CsvBenchmarkRenderer();
-				csv.renderer(bJob);
-			}
-			else //if the filename (jobname) is a path, set the jobname as the actual filename in the bjob 
-			{ 	 //(after the actual path has been used in the BenchmarkJob constructor above)
-				bJob.setJobname(FileManager.getFilename(bJob.getJobname()));
-			}
-			
-			html.renderer(bJob);
-			concatJobnames.append(bJob.getJobname()+"_");
+
+		// TODO check for type of graph and initialize velocityhtmlrenderer
+//		if(graph.equalsIgnoreCase("column"))
+//			html.populateGraph(concatJobnames, "ColumnChart");
+//		else
+//			html.populateGraph(concatJobnames, "LineChart");
+
+		
+		List<BenchmarkJob> bjobs = Lists.newArrayList();
+		for ( String jobname : jobnames ) {
+
+			BenchmarkJob bj = new BenchmarkJob(si, jobname, nowait);
+			bjobs.add(bj);
 		}
 		
-		if(concatJobnames.length()>200)
-			concatJobnames=new StringBuffer(concatJobnames.substring(0, 200));
+
+		BenchmarkRenderer html = new VelocityHtmlRenderer();
+		BenchmarkRenderer csv = new CsvBenchmarkRenderer();
 		
-		if(graph.equalsIgnoreCase("column"))
-			html.populateGraph(concatJobnames, "ColumnChart");
-		else
-			html.populateGraph(concatJobnames, "LineChart");
+		html.renderer(bjobs);
+		csv.renderer(bjobs);
+
 		
-	//	HtmlBenchmarkRenderer html = new HtmlBenchmarkRenderer();
-	//	html.renderer(jobnames);
 	}
 }

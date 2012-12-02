@@ -19,9 +19,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
+import org.apache.commons.io.FilenameUtils;
+
+import COM.claymoresystems.util.Bench;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class BenchmarkJob {
+	
+	
+	public static JobDetailsVO findBaselineJob(List<BenchmarkJob> jobs) {
+		
+		int minCpus = Integer.MAX_VALUE;
+		JobDetailsVO minJob = null;
+		for ( BenchmarkJob j : jobs ) {
+			for (JobDetailsVO temp : j.getJobs() ) {
+				
+				if (temp.getExecutionTime() < JobDetailsVO.THRESHOLD ) {
+					continue;
+				}
+				
+				if ( temp.getCpus() < minCpus) {
+					minCpus = temp.getCpus();
+					minJob = temp;
+				} else if (temp.getCpus() == minCpus) {
+
+
+					if ( temp.getTotalExecutionTime() < minJob.getTotalExecutionTime()  ) {
+						minJob = temp;
+					}
+
+				}
+			}
+		}
+		
+		return minJob;
+		
+	}
+	
 	private static final int waittime = 10;
 	private final ServiceInterface si;
 	private Boolean nowait;
@@ -53,9 +87,6 @@ public class BenchmarkJob {
 	}
 
 	private void init() {
-		UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si)
-				.getUserEnvironmentManager();
-		SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
 
 		Long totalExecTime = 0L;
 		Boolean jobsInProgress = true;
@@ -81,8 +112,6 @@ public class BenchmarkJob {
 					if (jobDets[5].length() > 0) {
 						tempRuntime=Long.parseLong(jobDets[5]);
 						jDetails.setExecutionTime(tempRuntime);
-						jDetails.setTotalExecutionTime(Long.parseLong(jobDets[6]));
-						jDetails.setEfficiency(Double.parseDouble(jobDets[7]));
 						
 						if(tempCpu<minCpus)
 						{
@@ -102,6 +131,10 @@ public class BenchmarkJob {
 		} 
 		//if the job name specified is not a csv file, find out the details of each job in that benchmark
 		else {
+			UserEnvironmentManager uem = GrisuRegistryManager.getDefault(si)
+					.getUserEnvironmentManager();
+			SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
+
 			while (jobsInProgress) {
 				jobsInProgress = false;
 				for (String jname : currentJobList) {
@@ -137,8 +170,6 @@ public class BenchmarkJob {
 										}
 
 										jDetails.setExecutionTime(totalExecTime);
-										jDetails.setTotalExecutionTime(totalExecTime
-												* cpus);
 										// jobs.put(jDetails, totalExecTime);
 										// jobs.add(jDetails);
 									} catch (Exception e) {
@@ -224,6 +255,15 @@ public class BenchmarkJob {
 	
 	public void setJobname(String jobname) {
 		this.jobname=jobname;
+	}
+	
+	public String toString() {
+		
+		if ( getJobname().endsWith(".csv") ) {
+			String filename = FilenameUtils.getName(getJobname());
+			return FilenameUtils.removeExtension(filename);
+		}
+		return getJobname();
 	}
 
 }

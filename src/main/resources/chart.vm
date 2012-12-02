@@ -1,0 +1,13 @@
+var data = google.visualization.arrayToDataTable($table);
+
+var options = {
+      title: '$title',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_$name'));
+chart.draw(data, options);
+

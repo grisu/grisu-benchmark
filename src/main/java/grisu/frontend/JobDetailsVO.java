@@ -3,13 +3,14 @@ package grisu.frontend;
 public class JobDetailsVO
 {
 	
+	public static final long THRESHOLD = 100;
+	
 	private String jobName;
 	private int hostCount;
 	private Boolean status;
 	private int cpus;
 	private int wallTime;
 	private Long executionTime;
-	private Long totalExecutionTime;
 	private double efficiency;
 	
 	public String getJobName() {
@@ -46,19 +47,26 @@ public class JobDetailsVO
 		return executionTime;
 	}
 	public void setExecutionTime(Long executionTime) {
+		if ( executionTime < THRESHOLD ) {
+			executionTime = 0L;
+		}
 		this.executionTime = executionTime;
 	}
 	public Long getTotalExecutionTime() {
-		return totalExecutionTime;
+		return this.executionTime * this.cpus;
 	}
-	public void setTotalExecutionTime(Long totalExecutionTime) {
-		this.totalExecutionTime = totalExecutionTime;
-	}
-	public double getEfficiency() {
+
+	public double getEfficiency(JobDetailsVO baselineJob) {
+		if ( getTotalExecutionTime() == null || getTotalExecutionTime().equals(0L) ) {
+			return 0;
+		}
+				
+		double efficiency = baselineJob.getTotalExecutionTime()
+				.doubleValue() / getTotalExecutionTime();
 		return efficiency;
 	}
-	public void setEfficiency(double efficiency) {
-		this.efficiency = efficiency;
-	}
+//	public void setEfficiency(double efficiency) {
+//		this.efficiency = efficiency;
+//	}
 		
 }

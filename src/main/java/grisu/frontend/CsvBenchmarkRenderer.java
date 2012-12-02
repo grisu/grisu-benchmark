@@ -12,7 +12,20 @@ public class CsvBenchmarkRenderer implements BenchmarkRenderer {
 
 	//create a csv file from the data for the benchmark job
 	@Override
-	public void renderer(BenchmarkJob bJob) {
+	public void renderer(List<BenchmarkJob> bJobs) {
+		
+		for ( BenchmarkJob bJob : bJobs ) {
+			renderer(bJob);
+		}
+		
+	}
+	
+	
+	private void renderer(BenchmarkJob bJob) {
+		
+		if ( bJob.getJobname().endsWith(".csv") ) {
+			return;
+		}
 
 		CSVWriter writer = null;
 		CSVWriter errWriter = null;
