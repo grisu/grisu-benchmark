@@ -1,0 +1,432 @@
+
+<html>
+
+
+
+<head>
+
+ <style type="text/css">
+
+table.pretty {
+ margin: 1em 1em 1em 2em;
+ background: whitesmoke;
+ border-collapse: collapse;
+}
+table.pretty th, table.pretty td {
+ border: 1px gainsboro solid;
+ padding: 0.2em;
+}
+table.pretty th {
+ background: gainsboro;
+ text-align: left;
+}
+table.pretty caption {
+ margin-left: inherit;
+ margin-right: inherit;
+}
+dl,ul {
+ margin: 1em 1em 1em 2em;
+ background: whitesmoke;
+ border-collapse: collapse;
+ padding: 0.2em;
+}
+dt {
+ background: gainsboro;
+ text-align: left;
+ font-weight:bolder;
+}
+dd,li {
+ font-style: italic;
+}
+
+ 
+</style>
+
+  <meta charset="utf-8">
+  <title>Benchmarks - gromacs_mpi_one_host, gromacs_mpi_one_host_tuned, gromacs_mpi_multiple_hosts_tuned, gromacs_smp_not_shared and gromacs_smp</title>
+  <meta name="description" content="Benchmark results for benchmarks: gromacs_mpi_one_host, gromacs_mpi_one_host_tuned, gromacs_mpi_multiple_hosts_tuned, gromacs_smp_not_shared and gromacs_smp">
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+    
+google.load("visualization", "1", {packages:["corechart"]});
+google.setOnLoadCallback(drawChart);
+function drawChart() {
+
+
+var data = google.visualization.arrayToDataTable([
+['Cpus','gromacs_mpi_one_host','gromacs_mpi_one_host_tuned','gromacs_mpi_multiple_hosts_tuned','gromacs_smp_not_shared','gromacs_smp'],
+['1',0.8543531326281529,1.0,0.653303035221555,0.9459459459459459,0.843285145610727],
+['2',1.029236276849642,0.9625348744519729,0.23332431596846498,0.6771914082216365,0.7622143668728696],
+['3',0.9610792741165234,0.8010747338043587,0.1122874558870709,0.7791327913279132,0.7114449845338047],
+['4',0.9322884496602841,0.9881342062193126,null,0.7268841801107633,0.6604134762633997],
+['5',0.9661932386477295,0.9551117263199526,0.08354811368078739,0.661100465370928,0.4025670945157526],
+['6',0.9824261654869416,0.8290422245108136,0.15223146747352495,0.6717289719626168,0.6855731561914495],
+['7',0.9610027855153204,0.5669679539852095,0.15615099121933557,0.6217336457019282,0.6213976945244957],
+['8',0.9632259093809827,0.8341392649903289,0.14414812338840607,0.6581098757357751,0.6356601389766267],
+['9',0.9641873278236914,0.7915437561455261,0.1164337990685296,0.6287097781943143,0.6382810022201079],
+['10',0.9440969507427678,0.7695984703632888,0.09173440705006458,0.5787203450754853,0.591042584434655],
+['11',0.7989281460897182,0.5572219658514075,0.28118014157973176,0.5339140431552883,0.5349548112706007],
+['12',0.7056451612903226,0.48705227492739595,0.2770512114537445,0.5243616466909848,0.5227272727272727],
+['13',null,0.0,0.0,0.5238838995184173,0.5339730691843367],
+['14',null,0.0,0.0,0.530932594644506,0.5270394133822182],
+['15',null,null,0.22937740418863087,null,null],
+['25',null,null,0.04530956848030019,null,null],
+['96',null,null,0.0,null,null],
+['128',null,null,0.0,null,null],
+['198',null,null,0.0,null,null]]);
+
+var options = {
+      title: 'Efficiency graph across all benchmarks',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_combined_efficiency'));
+chart.draw(data, options);
+
+
+var data = google.visualization.arrayToDataTable([
+['Cpus','gromacs_mpi_one_host','gromacs_mpi_one_host_tuned','gromacs_mpi_multiple_hosts_tuned','gromacs_smp_not_shared','gromacs_smp'],
+['1',28267,24150,36966,25530,28638],
+['2',23464,25090,103504,35662,31684],
+['3',25128,30147,215073,30996,33945],
+['4',25904,24440,null,33224,36568],
+['5',24995,25285,289055,36530,59990],
+['6',24582,29130,158640,35952,35226],
+['7',25130,42595,154658,38843,38864],
+['8',25072,28952,167536,36696,37992],
+['9',25047,30510,207414,38412,37836],
+['10',25580,31380,263260,41730,40860],
+['11',30228,43340,85888,45232,45144],
+['12',34224,49584,87168,46056,46200],
+['13',null,null,null,46098,45227],
+['14',null,null,null,45486,45822],
+['15',null,null,105285,null,null],
+['25',null,null,533000,null,null],
+['96',null,null,null,null,null],
+['128',null,null,null,null,null],
+['198',null,null,null,null,null]]);
+
+var options = {
+      title: 'Total compute time across all benchmarks',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_combined'));
+chart.draw(data, options);
+
+
+
+  
+         	var data = google.visualization.arrayToDataTable([
+['Cpus','Execution time','Total execution time across all cpus'],
+['1', 28267,28267],
+['2', 11732,23464],
+['3', 8376,25128],
+['4', 6476,25904],
+['5', 4999,24995],
+['6', 4097,24582],
+['7', 3590,25130],
+['8', 3134,25072],
+['9', 2783,25047],
+['10', 2558,25580],
+['11', 2748,30228],
+['12', 2852,34224]]);
+
+var options = {
+      title: '',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_gromacs_mpi_one_host'));
+chart.draw(data, options);
+
+
+         	var data = google.visualization.arrayToDataTable([
+['Cpus','Execution time','Total execution time across all cpus'],
+['1', 24150,24150],
+['2', 12545,25090],
+['3', 10049,30147],
+['4', 6110,24440],
+['5', 5057,25285],
+['6', 4855,29130],
+['7', 6085,42595],
+['8', 3619,28952],
+['9', 3390,30510],
+['10', 3138,31380],
+['11', 3940,43340],
+['12', 4132,49584],
+['13', null,null],
+['14', null,null]]);
+
+var options = {
+      title: '',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_gromacs_mpi_one_host_tuned'));
+chart.draw(data, options);
+
+
+         	var data = google.visualization.arrayToDataTable([
+['Cpus','Execution time','Total execution time across all cpus'],
+['1', 36966,36966],
+['2', 51752,103504],
+['3', 71691,215073],
+['5', 57811,289055],
+['6', 26440,158640],
+['7', 22094,154658],
+['8', 20942,167536],
+['9', 23046,207414],
+['10', 26326,263260],
+['11', 7808,85888],
+['12', 7264,87168],
+['13', null,null],
+['14', null,null],
+['15', 7019,105285],
+['25', 21320,533000]]);
+
+var options = {
+      title: '',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_gromacs_mpi_multiple_hosts_tuned'));
+chart.draw(data, options);
+
+
+         	var data = google.visualization.arrayToDataTable([
+['Cpus','Execution time','Total execution time across all cpus'],
+['1', 25530,25530],
+['2', 17831,35662],
+['3', 10332,30996],
+['4', 8306,33224],
+['5', 7306,36530],
+['6', 5992,35952],
+['7', 5549,38843],
+['8', 4587,36696],
+['9', 4268,38412],
+['10', 4173,41730],
+['11', 4112,45232],
+['12', 3838,46056],
+['13', 3546,46098],
+['14', 3249,45486]]);
+
+var options = {
+      title: '',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_gromacs_smp_not_shared'));
+chart.draw(data, options);
+
+
+         	var data = google.visualization.arrayToDataTable([
+['Cpus','Execution time','Total execution time across all cpus'],
+['1', 28638,28638],
+['2', 15842,31684],
+['3', 11315,33945],
+['4', 9142,36568],
+['5', 11998,59990],
+['6', 5871,35226],
+['7', 5552,38864],
+['8', 4749,37992],
+['9', 4204,37836],
+['10', 4184,41840],
+['10', 4086,40860],
+['11', 4104,45144],
+['12', 3850,46200],
+['13', 3479,45227],
+['14', 3273,45822]]);
+
+var options = {
+      title: '',
+      interpolateNulls:false,
+      axisTitlesPosition: 'in',
+      hAxis: {title: "number of cpus"},
+      legend: {position: 'bottom', alignment: 'end'}
+};
+
+var chart = new google.visualization.LineChart(document.getElementById('graph_gromacs_smp'));
+chart.draw(data, options);
+
+
+    
+}
+   
+   </script>
+ </head>
+
+<body>
+    <div id="wrapper">
+		
+				<h2>Benchmark comparison</h2>
+    
+    	<h4>Benchmarks</h4>
+		<div>
+		<dl>			    	
+    	    		<dt>gromacs_mpi_one_host</dt>
+    		<dd>no description</dd> 
+		    		<dt>gromacs_mpi_one_host_tuned</dt>
+    		<dd>Submitted</dd> 
+		    		<dt>gromacs_mpi_multiple_hosts_tuned</dt>
+    		<dd>no description</dd> 
+		    		<dt>gromacs_smp_not_shared</dt>
+    		<dd>no description</dd> 
+		    		<dt>gromacs_smp</dt>
+    		<dd>no description</dd> 
+				</dl>
+		</div>
+		<div>
+			<h4>Baseline</h4>
+			<ul>
+			<li>Benchmark: gromacs_mpi_one_host_tuned</li>
+			<li>CPUs: 1</li>
+			<li>Total executiontime: 24150</li>
+			</ul> 
+		</div>
+		
+        <div id="graph_combined_efficiency" style="width: 1200px; height: 500px; "></div>
+
+        <div id="graph_combined" style="width: 1200px; height: 500px; "></div>
+        
+        
+		<table width:"100%">
+		  <tr><td style="width:800px"></td><td nowrap="nowrap"></td></tr>
+					<tr><td colspan="2"><h4>Benchmark: gromacs_mpi_one_host</h4></td></tr> 
+			<tr>
+        		<td><div id="graph_gromacs_mpi_one_host" style="width: 100%; height: 450px"></div></td>
+        		<td>
+					<table class="pretty"><tr><th nowrap="nowrap">Cpus</th><th nowrap="nowrap">Execution time</th><th nowrap="nowrap">Total time</th><th nowrap="nowrap" >Efficiency</th></tr>
+<tr><td>1</td><td>28267</td><td>28267</td><td>0.85</td></tr>
+<tr><td>2</td><td>11732</td><td>23464</td><td>1.03</td></tr>
+<tr><td>3</td><td>8376</td><td>25128</td><td>0.96</td></tr>
+<tr><td>4</td><td>6476</td><td>25904</td><td>0.93</td></tr>
+<tr><td>5</td><td>4999</td><td>24995</td><td>0.97</td></tr>
+<tr><td>6</td><td>4097</td><td>24582</td><td>0.98</td></tr>
+<tr><td>7</td><td>3590</td><td>25130</td><td>0.96</td></tr>
+<tr><td>8</td><td>3134</td><td>25072</td><td>0.96</td></tr>
+<tr><td>9</td><td>2783</td><td>25047</td><td>0.96</td></tr>
+<tr><td>10</td><td>2558</td><td>25580</td><td>0.94</td></tr>
+<tr><td>11</td><td>2748</td><td>30228</td><td>0.8</td></tr>
+<tr><td>12</td><td>2852</td><td>34224</td><td>0.71</td></tr>
+</table>
+        		</td>
+        	</tr>
+        			<tr><td colspan="2"><h4>Benchmark: gromacs_mpi_one_host_tuned</h4></td></tr> 
+			<tr>
+        		<td><div id="graph_gromacs_mpi_one_host_tuned" style="width: 100%; height: 450px"></div></td>
+        		<td>
+					<table class="pretty"><tr><th nowrap="nowrap">Cpus</th><th nowrap="nowrap">Execution time</th><th nowrap="nowrap">Total time</th><th nowrap="nowrap" >Efficiency</th></tr>
+<tr><td>1</td><td>24150</td><td>24150</td><td>1.0</td></tr>
+<tr><td>2</td><td>12545</td><td>25090</td><td>0.96</td></tr>
+<tr><td>3</td><td>10049</td><td>30147</td><td>0.8</td></tr>
+<tr><td>4</td><td>6110</td><td>24440</td><td>0.99</td></tr>
+<tr><td>5</td><td>5057</td><td>25285</td><td>0.96</td></tr>
+<tr><td>6</td><td>4855</td><td>29130</td><td>0.83</td></tr>
+<tr><td>7</td><td>6085</td><td>42595</td><td>0.57</td></tr>
+<tr><td>8</td><td>3619</td><td>28952</td><td>0.83</td></tr>
+<tr><td>9</td><td>3390</td><td>30510</td><td>0.79</td></tr>
+<tr><td>10</td><td>3138</td><td>31380</td><td>0.77</td></tr>
+<tr><td>11</td><td>3940</td><td>43340</td><td>0.56</td></tr>
+<tr><td>12</td><td>4132</td><td>49584</td><td>0.49</td></tr>
+<tr><td>13</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+<tr><td>14</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+</table>
+        		</td>
+        	</tr>
+        			<tr><td colspan="2"><h4>Benchmark: gromacs_mpi_multiple_hosts_tuned</h4></td></tr> 
+			<tr>
+        		<td><div id="graph_gromacs_mpi_multiple_hosts_tuned" style="width: 100%; height: 450px"></div></td>
+        		<td>
+					<table class="pretty"><tr><th nowrap="nowrap">Cpus</th><th nowrap="nowrap">Execution time</th><th nowrap="nowrap">Total time</th><th nowrap="nowrap" >Efficiency</th></tr>
+<tr><td>1</td><td>36966</td><td>36966</td><td>0.65</td></tr>
+<tr><td>2</td><td>51752</td><td>103504</td><td>0.23</td></tr>
+<tr><td>3</td><td>71691</td><td>215073</td><td>0.11</td></tr>
+<tr><td>5</td><td>57811</td><td>289055</td><td>0.08</td></tr>
+<tr><td>6</td><td>26440</td><td>158640</td><td>0.15</td></tr>
+<tr><td>7</td><td>22094</td><td>154658</td><td>0.16</td></tr>
+<tr><td>8</td><td>20942</td><td>167536</td><td>0.14</td></tr>
+<tr><td>9</td><td>23046</td><td>207414</td><td>0.12</td></tr>
+<tr><td>10</td><td>26326</td><td>263260</td><td>0.09</td></tr>
+<tr><td>11</td><td>7808</td><td>85888</td><td>0.28</td></tr>
+<tr><td>12</td><td>7264</td><td>87168</td><td>0.28</td></tr>
+<tr><td>13</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+<tr><td>14</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+<tr><td>15</td><td>7019</td><td>105285</td><td>0.23</td></tr>
+<tr><td>25</td><td>21320</td><td>533000</td><td>0.05</td></tr>
+<tr><td>96</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+<tr><td>128</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+<tr><td>198</td><td>n/a</td><td>n/a</td><td>0.0</td></tr>
+</table>
+        		</td>
+        	</tr>
+        			<tr><td colspan="2"><h4>Benchmark: gromacs_smp_not_shared</h4></td></tr> 
+			<tr>
+        		<td><div id="graph_gromacs_smp_not_shared" style="width: 100%; height: 450px"></div></td>
+        		<td>
+					<table class="pretty"><tr><th nowrap="nowrap">Cpus</th><th nowrap="nowrap">Execution time</th><th nowrap="nowrap">Total time</th><th nowrap="nowrap" >Efficiency</th></tr>
+<tr><td>1</td><td>25530</td><td>25530</td><td>0.95</td></tr>
+<tr><td>2</td><td>17831</td><td>35662</td><td>0.68</td></tr>
+<tr><td>3</td><td>10332</td><td>30996</td><td>0.78</td></tr>
+<tr><td>4</td><td>8306</td><td>33224</td><td>0.73</td></tr>
+<tr><td>5</td><td>7306</td><td>36530</td><td>0.66</td></tr>
+<tr><td>6</td><td>5992</td><td>35952</td><td>0.67</td></tr>
+<tr><td>7</td><td>5549</td><td>38843</td><td>0.62</td></tr>
+<tr><td>8</td><td>4587</td><td>36696</td><td>0.66</td></tr>
+<tr><td>9</td><td>4268</td><td>38412</td><td>0.63</td></tr>
+<tr><td>10</td><td>4173</td><td>41730</td><td>0.58</td></tr>
+<tr><td>11</td><td>4112</td><td>45232</td><td>0.53</td></tr>
+<tr><td>12</td><td>3838</td><td>46056</td><td>0.52</td></tr>
+<tr><td>13</td><td>3546</td><td>46098</td><td>0.52</td></tr>
+<tr><td>14</td><td>3249</td><td>45486</td><td>0.53</td></tr>
+</table>
+        		</td>
+        	</tr>
+        			<tr><td colspan="2"><h4>Benchmark: gromacs_smp</h4></td></tr> 
+			<tr>
+        		<td><div id="graph_gromacs_smp" style="width: 100%; height: 450px"></div></td>
+        		<td>
+					<table class="pretty"><tr><th nowrap="nowrap">Cpus</th><th nowrap="nowrap">Execution time</th><th nowrap="nowrap">Total time</th><th nowrap="nowrap" >Efficiency</th></tr>
+<tr><td>1</td><td>28638</td><td>28638</td><td>0.84</td></tr>
+<tr><td>2</td><td>15842</td><td>31684</td><td>0.76</td></tr>
+<tr><td>3</td><td>11315</td><td>33945</td><td>0.71</td></tr>
+<tr><td>4</td><td>9142</td><td>36568</td><td>0.66</td></tr>
+<tr><td>5</td><td>11998</td><td>59990</td><td>0.4</td></tr>
+<tr><td>6</td><td>5871</td><td>35226</td><td>0.69</td></tr>
+<tr><td>7</td><td>5552</td><td>38864</td><td>0.62</td></tr>
+<tr><td>8</td><td>4749</td><td>37992</td><td>0.64</td></tr>
+<tr><td>9</td><td>4204</td><td>37836</td><td>0.64</td></tr>
+<tr><td>10</td><td>4184</td><td>41840</td><td>0.58</td></tr>
+<tr><td>10</td><td>4086</td><td>40860</td><td>0.59</td></tr>
+<tr><td>11</td><td>4104</td><td>45144</td><td>0.53</td></tr>
+<tr><td>12</td><td>3850</td><td>46200</td><td>0.52</td></tr>
+<tr><td>13</td><td>3479</td><td>45227</td><td>0.53</td></tr>
+<tr><td>14</td><td>3273</td><td>45822</td><td>0.53</td></tr>
+</table>
+        		</td>
+        	</tr>
+        		</table>
+        
+
+    </div>
+
+</body>
+</html>   
