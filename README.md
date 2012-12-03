@@ -12,8 +12,8 @@ Download / Install
  * Java 6
 
 ### Downloads
- * executable jar file: [here](https://code.ceres.auckland.ac.nz/jenkins/job/grisu-benchmarks-SNAPSHOT/lastSuccessfulBuild/artifact/target/grisu-benchmark-binary.jar)
- * deb & rpm packages: [here](https://code.ceres.auckland.ac.nz/jenkins/job/grisu-benchmarks-SNAPSHOT/)
+ * executable jar file: [here](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark-binary.jar)
+ * linux packages: [deb](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark.deb) and [rpm](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark.rpm)
 
 ### Usage
 
@@ -55,7 +55,7 @@ For this testjob we also need a textfile with some random content. Created that 
 
 #### Submitting the benchmark
 
-    grisu-benchmark-subit --script /path/to/testjob.sh --cpu 1,2,3,4,5,6,7,8,16,32,64 --group /nz/nesi --queue pan:pan.nesi.org.nz --files /path/to/testfile.txt --jobname testjob -w 2000
+    grisu-benchmark-subit --script /path/to/testjob.sh --cpu 1,2,3,4,5,6,7,8,16,32,64 --group /nz/nesi --queue pan:pan.nesi.org.nz --files /path/to/testfile.txt --jobname testjob -w 6h
 
 ##### Available commandline parameters for benchmark submission
 
@@ -89,23 +89,28 @@ allows to set additional environment variables for a job, something like:
 
 #### Gathering the benchmark results
 
-    grisu-benchmark-results --jobname testjob
+If you only want details for one job:
 
-The details of all finished jobs can be viewed, by giving the corresponding job name as a command line argument.
+    grisu-benchmark-results --jobnames testjob
+    
+If you want to compare several benchmark runs against each other, specify a list of comma-seperated benchmark names:
+
+    grisu-benchmark-results --jobnames testjob,testjob2,testjob3
+    
 The details like job name, host count, status, number of CPUs used, wall time, total execution time, average execution time per CPU and efficiency are logged in a newly created csv file having the job's name.
-An HTML file showing a graph of the execution time, per cpu execution time and efficiency against the number of CPUs is also created.
+    
+You can also specify an already created .csv file instead of a benchmark name for both of the above scenarios.
+
+An HTML file (called 'benchmark.html) is created showing a graph of the execution time, per cpu execution time and efficiency against the number of CPUs is also created.
 
 ##### Available commandline parameters for gathering benchmark results
 
-_--list_ (optional): 
+_--list_ (optional, default if no other parameter specified): 
 the list option if specified, lists down all the current benchmark jobs along with the total number of jobs, number of finished jobs and the number of jobs which are still in progress for each benchmark job
 
-_-n_ or _--jobname_ (required if --list option not used): 
+_-n_ or _--jobnames_ (required if --list option not used): 
 specifies a series of benchmark-job names, as a comma separated list, whose results need to be obtained
 
 _--no-wait_ (optional): 
 if specified, it does not wait for all the jobs to finish before populating the final results for the specified benchmark jobs
-
---graph (optional): 
-specifies the type of graph/chart (line or column) to be used to display the combined results for all the jobs in the list specified
 
