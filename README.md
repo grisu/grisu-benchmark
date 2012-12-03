@@ -1,7 +1,9 @@
 Grisu Benchmark
 ================
  
-_grisu-benchmark_  is a Grisu client which allows you to run the same job with several (cpu-)configurations and measure how execution time is affected.
+_grisu-benchmark_  is a Grisu client which allows you to run the same job with several (cpu-)configurations and measure how execution time is affected. 
+
+It can also compare several of those runs against each other and produce html files like [this](https://raw.github.com/grisu/grisu-benchmark/develop/example/benchmark.html) (you'll need to download this file if you want your browser to render it correctly).
 
 
 Download / Install
