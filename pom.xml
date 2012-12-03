@@ -34,7 +34,6 @@
 		<connection>scm:git:git://github.com/grisu/grisu-benchmark.git</connection>
 		<developerConnection>scm:git:git@github.com:grisu/grisu-benchmark.git</developerConnection>
 		<url>https://github.com/grisu/grisu-benchmark</url>
-	  <tag>HEAD</tag>
   </scm>
 
 	<dependencies>
