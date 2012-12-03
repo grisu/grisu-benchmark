@@ -5,6 +5,7 @@ import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobObject;
 import grisu.frontend.view.cli.GrisuCliClient;
+import grisu.jcommons.utils.OutputHelpers;
 import grisu.model.FileManager;
 import grisu.model.GrisuRegistryManager;
 import grisu.model.UserEnvironmentManager;
@@ -75,9 +76,9 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		
 		String graph = getCliParameters().getGraph();
 
-		if (jobnames == null && !list)
-			System.out
-					.println("Please specify a job name or use the --list option");
+		if (jobnames == null && !list) {
+			list = true;
+		}
 		
 		if(graph==null || (!graph.equalsIgnoreCase("line") && !graph.equalsIgnoreCase("column")))
 		{
@@ -105,20 +106,32 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			int jCount = 0;
 			int jOn = 0;
 			int jFinished = 0;
+			List<List<String>> table = Lists.newArrayList();
+			List<String> titleRow = Lists.newArrayList();
+			titleRow.add("Benchmark");
+			titleRow.add("JobCount (total)");
+			titleRow.add("JobCount (finished)");
+			titleRow.add("JobCount (running)");
+			table.add(titleRow);
+			List<String> row = null;
 			for (String jobName : currentJobList) {
 				if (jobName.contains("_cpus_")) {
 					index = jobName.indexOf("_cpus_");
+
 					if (!jobName.substring(0, index - 5).equals(jnConst)) {
 						jnConst = jobName.substring(0, index - 5);
 						if (jCount != 0) {
-							System.out.print("\tJob Count: " + jCount
-									+ "\tFinished jobs count: " + jFinished
-									+ "\tIn progress jobs count: " + jOn);
+							row = Lists.newArrayList();
+							row.add(jnConst);
+							row.add(Integer.toString(jCount));
+							row.add(Integer.toString(jFinished));
+							row.add(Integer.toString(jOn));
 							jCount = 0;
 							jFinished = 0;
 							jOn = 0;
+							
+							table.add(row);
 						}
-						System.out.print("\n" + jnConst);
 					}
 					JobObject job;
 					try {
@@ -133,9 +146,11 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 					}
 				}
 			}
-			System.out.print("\tJob Count: " + jCount
-					+ "\tFinished jobs count: " + jFinished
-					+ "\tIn progress jobs count: " + jOn + "\n");
+			table.add(row);
+			
+			String t = OutputHelpers.getTable(table);
+			System.out.println("\n"+t);
+
 			System.exit(0);
 		}
 
