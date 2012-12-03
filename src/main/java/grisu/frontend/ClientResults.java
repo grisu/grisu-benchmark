@@ -6,28 +6,17 @@ import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobObject;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.utils.OutputHelpers;
-import grisu.model.FileManager;
 import grisu.model.GrisuRegistryManager;
 import grisu.model.UserEnvironmentManager;
-import grisu.model.dto.DtoJob;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
-import org.python.antlr.ast.boolopType;
-import org.python.apache.html.dom.HTMLBaseElementImpl;
-import org.python.indexer.demos.HtmlDemo;
-
-import au.com.bytecode.opencsv.CSVWriter;
-
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
@@ -101,52 +90,66 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 		// if --list option is specified
 		if (list) {
-			String jnConst = "";
-			int index;
-			int jCount = 0;
-			int jOn = 0;
-			int jFinished = 0;
+
+
 			List<List<String>> table = Lists.newArrayList();
 			List<String> titleRow = Lists.newArrayList();
 			titleRow.add("Benchmark");
-			titleRow.add("JobCount (total)");
-			titleRow.add("JobCount (finished)");
 			titleRow.add("JobCount (running)");
+			titleRow.add("JobCount (finished)");
+			titleRow.add("JobCount (total)");
+
 			table.add(titleRow);
-			List<String> row = null;
+			
+			Map<String, Set<JobObject>> benchmarkMap = Maps.newTreeMap();
+			
 			for (String jobName : currentJobList) {
 				if (jobName.contains("_cpus_")) {
-					index = jobName.indexOf("_cpus_");
+					int index = jobName.indexOf("_cpus_");
+					
+					String benchmarkName = jobName.substring(0, index - 5);
 
-					if (!jobName.substring(0, index - 5).equals(jnConst)) {
-						jnConst = jobName.substring(0, index - 5);
-						if (jCount != 0) {
-							row = Lists.newArrayList();
-							row.add(jnConst);
-							row.add(Integer.toString(jCount));
-							row.add(Integer.toString(jFinished));
-							row.add(Integer.toString(jOn));
-							jCount = 0;
-							jFinished = 0;
-							jOn = 0;
-							
-							table.add(row);
-						}
+					Set<JobObject> jobs = benchmarkMap.get(benchmarkName);
+					if ( jobs == null ) {
+						jobs = Sets.newTreeSet();
+						benchmarkMap.put(benchmarkName, jobs);
 					}
+
 					JobObject job;
 					try {
 						job = new JobObject(si, jobName);
-						if (job.isFinished())
-							jFinished++;
-						else
-							jOn++;
-						jCount++;
+						
+						jobs.add(job);
+
 					} catch (NoSuchJobException e) {
 						e.printStackTrace();
 					}
 				}
 			}
-			table.add(row);
+			
+			for ( String name : benchmarkMap.keySet() ) {
+				
+				int jCount = 0;
+				int jOn = 0;
+				int jFinished = 0;
+				
+				for ( JobObject job : benchmarkMap.get(name) ) {
+					
+					if (job.isFinished())
+						jFinished++;
+					else
+						jOn++;
+					jCount++;
+					
+				}
+				List<String> row = Lists.newArrayList();
+				row.add(name);
+				row.add(Integer.toString(jOn));
+				row.add(Integer.toString(jFinished));
+				row.add(Integer.toString(jCount));
+				table.add(row);
+			}
+			
 			
 			String t = OutputHelpers.getTable(table);
 			System.out.println("\n"+t);
