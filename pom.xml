@@ -5,12 +5,12 @@
 	<artifactId>grisu-benchmark</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1-SNAPSHOT</version>
-	<name>a grisu client</name>
+	<name>a grisu benchmark client</name>
 
 	<parent>
 		<groupId>nz.org.nesi</groupId>
 		<artifactId>nesi</artifactId>
-		<version>0.22</version>
+		<version>0.23</version>
 	</parent>
 
 	<repositories>
@@ -30,6 +30,12 @@
 		</repository>
 	</repositories>
 
+	<scm>
+		<connection>scm:git:git://github.com/grisu/grisu-benchmark.git</connection>
+		<developerConnection>scm:git:git@github.com:grisu/grisu-benchmark.git</developerConnection>
+		<url>https://github.com/grisu/grisu-benchmark</url>
+	  <tag>HEAD</tag>
+  </scm>
 
 	<dependencies>
 
@@ -108,10 +114,26 @@
 			<version>2.0</version>
 		</dependency>
 	</dependencies>
+	
+	
 
 	<build>
 
 		<plugins>
+		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.3.2</version>
+<!-- 				<inherited>false</inherited> -->
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<pushChanges>true</pushChanges>
+					<localCheckout>true</localCheckout>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+					<releaseProfiles>deb,rpm</releaseProfiles>
+				</configuration>
+			</plugin>		
 
 			<!-- replace version in file -->
 			<plugin>
