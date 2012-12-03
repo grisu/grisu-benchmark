@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 
 import COM.claymoresystems.util.Bench;
 import au.com.bytecode.opencsv.CSVReader;
@@ -34,7 +35,7 @@ public class BenchmarkJob {
 		for ( BenchmarkJob j : jobs ) {
 			for (JobDetailsVO temp : j.getJobs() ) {
 				
-				if (temp.getExecutionTime() < JobDetailsVO.THRESHOLD ) {
+				if (temp.getExecutionTime() == null || temp.getExecutionTime() < JobDetailsVO.THRESHOLD ) {
 					continue;
 				}
 				
@@ -67,6 +68,8 @@ public class BenchmarkJob {
 	private List<JobDetailsVO> jobs = new ArrayList<JobDetailsVO>();
 	private List<String> jList = new ArrayList<String>();
 	private List<String[]> csvReadList;
+	
+	private String description = Client.NO_DESCRIPTION;
 
 	public BenchmarkJob(ServiceInterface si, String jobname, Boolean nowait) {
 		this.si = si;
@@ -85,6 +88,10 @@ public class BenchmarkJob {
 			}
 		});
 	}
+	
+	public String getDescription() {
+		return this.description;
+	}
 
 	private void init() {
 
@@ -94,6 +101,7 @@ public class BenchmarkJob {
 		Long tempRuntime;
 		//if jobname specified at the command line is a csv file, populate the jobs list from this csv file
 		if (jobname.endsWith(".csv")) {
+			String desc = Client.NO_DESCRIPTION;
 			CSVReader reader=null;
 			try {
 				reader = new CSVReader(new FileReader(jobname));
@@ -102,7 +110,7 @@ public class BenchmarkJob {
 				for (int i = 1; i < csvReadList.size(); i++) {
 					jobDets = csvReadList.get(i);
 
-					JobDetailsVO jDetails = new JobDetailsVO();
+					JobDetailsVO jDetails = new JobDetailsVO(this);
 					jDetails.setJobName(jobDets[0]);
 					jDetails.setHostCount(Integer.parseInt(jobDets[1]));
 					jDetails.setStatus(Boolean.parseBoolean(jobDets[2]));
@@ -119,6 +127,7 @@ public class BenchmarkJob {
 							minRunTime = tempRuntime;
 						}
 					}
+					jDetails.setDescription(desc);
 					jobs.add(jDetails);
 				}
 				reader.close();
@@ -154,14 +163,20 @@ public class BenchmarkJob {
 								if (!jList.contains(jname)) {
 									Integer cpus = job.getCpus();
 
-									JobDetailsVO jDetails = new JobDetailsVO();
+									JobDetailsVO jDetails = new JobDetailsVO(this);
 									jDetails.setJobName(jname);
 									jDetails.setHostCount(job.getHostCount());
 									jDetails.setStatus(job.isSuccessful(true));
 									jDetails.setWallTime(job
 											.getWalltimeInSeconds());
 									jDetails.setCpus(cpus);
-
+									String desc = job.getDescription();
+									if ( StringUtils.isBlank(desc) ) {
+										desc = Client.NO_DESCRIPTION;
+									} else {
+										this.description = desc;
+									}
+									jDetails.setDescription(desc);
 									try {
 										totalExecTime = getExecutionTime(job);
 										if (cpus < minCpus) {

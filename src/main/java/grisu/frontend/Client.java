@@ -15,6 +15,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
+	
+	public static final String NO_DESCRIPTION = "no description";
 
 	public static void main(String[] args) {
 
@@ -59,6 +61,10 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		String files = getCliParameters().getFiles();
 		List<String> envVarList = getCliParameters().getEnvVars();
 		String args = getCliParameters().getArgs();
+		String desc = getCliParameters().getDescription();
+		if (StringUtils.isBlank(desc) ) {
+			desc = NO_DESCRIPTION;
+		}
 
 		// merging older changes
 		String wallTime = getCliParameters().getWallTime();
@@ -154,6 +160,8 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 					+ job.isForce_single());
 
 			job.setSubmissionLocation(queue);
+			
+			job.setDescription(desc);
 
 			temp = cpuSplit[i].split("=");
 			String holder;

@@ -1,8 +1,10 @@
 package grisu.frontend;
 
+import grisu.control.JobConstants;
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
+import grisu.frontend.model.events.JobCleanedEvent;
 import grisu.frontend.model.job.JobObject;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.utils.OutputHelpers;
@@ -63,17 +65,17 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 		boolean list = getCliParameters().getList();
 		
-		String graph = getCliParameters().getGraph();
+//		String graph = getCliParameters().getGraph();
 
 		if (jobnames == null && !list) {
 			list = true;
 		}
 		
-		if(graph==null || (!graph.equalsIgnoreCase("line") && !graph.equalsIgnoreCase("column")))
-		{
-			System.out.println("Setting default graph type to Line");
-			graph="Line";
-		}
+//		if(graph==null || (!graph.equalsIgnoreCase("line") && !graph.equalsIgnoreCase("column")))
+//		{
+//			System.out.println("Setting default graph type to Line");
+//			graph="Line";
+//		}
 		
 		System.out.println("Getting serviceinterface...");
 		ServiceInterface si = null;
@@ -91,13 +93,17 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 		// if --list option is specified
 		if (list) {
 
+			System.out.println("Retrieving benchmark jobs. This might take a while...");
 
 			List<List<String>> table = Lists.newArrayList();
 			List<String> titleRow = Lists.newArrayList();
 			titleRow.add("Benchmark");
-			titleRow.add("JobCount (running)");
-			titleRow.add("JobCount (finished)");
+			titleRow.add("Pending");
+			titleRow.add("Active");
+			titleRow.add("Failed");
+			titleRow.add("Finished");
 			titleRow.add("JobCount (total)");
+			titleRow.add("");
 
 			table.add(titleRow);
 			
@@ -129,24 +135,41 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 			
 			for ( String name : benchmarkMap.keySet() ) {
 				
-				int jCount = 0;
-				int jOn = 0;
-				int jFinished = 0;
+				int total = 0;
+				int pending = 0;
+				int finished = 0;
+				int failed = 0;
+				int active = 0;
 				
 				for ( JobObject job : benchmarkMap.get(name) ) {
 					
-					if (job.isFinished())
-						jFinished++;
-					else
-						jOn++;
-					jCount++;
+					if (job.isFinished()) {
+						finished++;
+						if ( job.isFailed(false)) {
+							failed++;
+						}
+					} else {
+						if ( job.getStatus(false) < JobConstants.ACTIVE ) {
+							pending++;
+						} else {
+							active++;
+						}
+					}
+					total++;
 					
 				}
 				List<String> row = Lists.newArrayList();
 				row.add(name);
-				row.add(Integer.toString(jOn));
-				row.add(Integer.toString(jFinished));
-				row.add(Integer.toString(jCount));
+				row.add(Integer.toString(pending));
+				row.add(Integer.toString(active));
+				row.add(Integer.toString(failed));
+				row.add(Integer.toString(finished));
+				row.add(Integer.toString(total));
+				if ( pending == 0 && active == 0 ) {
+					row.add("Finished");
+				} else {
+					row.add("");
+				}
 				table.add(row);
 			}
 			

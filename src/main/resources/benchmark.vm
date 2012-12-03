@@ -6,6 +6,7 @@
 <head>
 
  <style type="text/css">
+
 table.pretty {
  margin: 1em 1em 1em 2em;
  background: whitesmoke;
@@ -23,6 +24,22 @@ table.pretty caption {
  margin-left: inherit;
  margin-right: inherit;
 }
+dl,ul {
+ margin: 1em 1em 1em 2em;
+ background: whitesmoke;
+ border-collapse: collapse;
+ padding: 0.2em;
+}
+dt {
+ background: gainsboro;
+ text-align: left;
+ font-weight:bolder;
+}
+dd,li {
+ font-style: italic;
+}
+
+ 
 </style>
 
   <meta charset="utf-8">
@@ -34,9 +51,13 @@ table.pretty caption {
 google.load("visualization", "1", {packages:["corechart"]});
 google.setOnLoadCallback(drawChart);
 function drawChart() {
-    
+
+#if ($benchmarks.size() > 1) 
+
 $renderer.createCombinedEfficiencyGraphHtml($benchmarks, $baseline)
 $renderer.createCombinedGraphHtml($benchmarks)
+
+#end
   
   #foreach ( $benchmark in $benchmarks )
        	$renderer.createGraphHtml($benchmark)
@@ -49,25 +70,43 @@ $renderer.createCombinedGraphHtml($benchmarks)
 
 <body>
     <div id="wrapper">
-
-		##<div>
-		##	Baseline: $baseline.getCpus() cpu, Total executiontime: $baseline.getTotalExecutionTime() (job: $baseline.getJobName())
-		##</div>
+		
+		#if ($benchmarks.size() > 1) 
+		<h2>Benchmark comparison</h2>
     
+    	<h4>Benchmarks</h4>
+		<div>
+		<dl>			    	
+    	#foreach ($benchmark in $benchmarks)
+    		<dt>$benchmark.getJobname()</dt>
+    		<dd>$benchmark.getDescription()</dd> 
+		#end
+		</dl>
+		</div>
+		<div>
+			<h4>Baseline</h4>
+			<ul>
+			<li>Benchmark: $baseline.getBenchmarkJob().getJobname()</li>
+			<li>CPUs: $baseline.getCpus()</li>
+			<li>Total executiontime: $baseline.getTotalExecutionTime()</li>
+			</ul> 
+		</div>
+		
         <div id="graph_combined_efficiency" style="width: 1200px; height: 500px; "></div>
 
         <div id="graph_combined" style="width: 1200px; height: 500px; "></div>
+        
+        #end
 
 		<table width:"100%">
 		  <tr><td style="width:800px"></td><td nowrap="nowrap"></td></tr>
 		#foreach ($benchmark in $benchmarks)
+			<tr><td colspan="2"><h4>Benchmark: $benchmark.getJobname()</h4></td></tr> 
 			<tr>
         		<td><div id="graph_$benchmark" style="width: 100%; height: 450px"></div></td>
-        		<td><div>
-				<table class="pretty">
-            		$renderer.createTableHtml($benchmark, $baseline)
-	        	</table>
-        		</div></td>
+        		<td>
+					<table class="pretty">$renderer.createTableHtml($benchmark, $baseline)</table>
+        		</td>
         	</tr>
         #end
 		</table>

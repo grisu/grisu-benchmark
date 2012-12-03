@@ -8,10 +8,29 @@ public class JobDetailsVO
 	private String jobName;
 	private int hostCount;
 	private Boolean status;
-	private int cpus;
+	private Integer cpus;
 	private int wallTime;
 	private Long executionTime;
-	private double efficiency;
+
+	private String description;
+	
+	public void setDescription(String d) {
+		this.description = d;
+	}
+	
+	public String getDescription() {
+		return this.description;
+	}
+	
+	private final BenchmarkJob benchmark;
+	
+	public JobDetailsVO(BenchmarkJob bm) {
+		this.benchmark = bm;
+	}
+	
+	public BenchmarkJob getBenchmarkJob() {
+		return benchmark;
+	}
 	
 	public String getJobName() {
 		return jobName;
@@ -53,10 +72,16 @@ public class JobDetailsVO
 		this.executionTime = executionTime;
 	}
 	public Long getTotalExecutionTime() {
+		if ( this.executionTime == null || this.cpus == null ) {
+			return 0L;
+		}
 		return this.executionTime * this.cpus;
 	}
 
 	public double getEfficiency(JobDetailsVO baselineJob) {
+		if (baselineJob.getTotalExecutionTime().equals(0L) ) {
+			return 0;
+		}
 		if ( getTotalExecutionTime() == null || getTotalExecutionTime().equals(0L) ) {
 			return 0;
 		}

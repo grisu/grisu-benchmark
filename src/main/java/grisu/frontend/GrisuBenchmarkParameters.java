@@ -1,8 +1,8 @@
 package grisu.frontend;
 
-import java.util.List;
-
 import grisu.frontend.view.cli.GrisuCliParameters;
+
+import java.util.List;
 
 import com.beust.jcommander.Parameter;
 
@@ -35,6 +35,13 @@ public class GrisuBenchmarkParameters extends GrisuCliParameters {
 
 	public String getWallTime(){
 		return wallTime;
+	}
+	
+	@Parameter(names = {"-d", "--description"}, description = "a description for this benchmark setup")
+	public String description;
+	
+	public String getDescription(){
+		return description;
 	}
 
 

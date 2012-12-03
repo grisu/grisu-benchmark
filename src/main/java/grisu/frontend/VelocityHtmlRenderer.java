@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -90,7 +91,8 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	Map<String, Object> properties = Maps.newHashMap();
     	properties.put("table", array);
     	properties.put("name", bJob.toString());
-    	properties.put("title", "Benchmark: "+bJob.toString());
+    	//properties.put("title", "Benchmark: "+bJob.toString());
+    	properties.put("title", "");
     	
     	return render("chart", properties);
     	
@@ -111,7 +113,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     		result.append(j.getCpus());
     		result.append("</td><td>");
     		Long exe = j.getExecutionTime();
-    		if ( exe == null ) {
+    		if ( exe == null || exe < JobDetailsVO.THRESHOLD ) {
     			result.append("n/a");
         		result.append("</td><td>");
         		result.append("n/a");
@@ -121,7 +123,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
         		result.append(j.getTotalExecutionTime());
     		}
     		result.append("</td><td>");
-    		if ( baselineJob != null ) {
+    		if ( baselineJob != null || exe < JobDetailsVO.THRESHOLD ) {
     			result.append(trimDouble(j.getEfficiency(baselineJob)));
     		} else {
     			result.append("n/a");
@@ -157,7 +159,8 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	Map<String, Object> properties = Maps.newHashMap();
     	properties.put("table", array);
     	properties.put("name", "combined_efficiency");
-    	properties.put("title", "Efficiency graph across all benchmarks (using baseline: "+baseline.getCpus()+"cpus, total executiontime: "+baseline.getTotalExecutionTime()+")");
+    	//properties.put("title", "Efficiency graph across all benchmarks (using baseline: "+baseline.getCpus()+" cpus, total execution time: "+baseline.getTotalExecutionTime()+")");
+    	properties.put("title", "Efficiency graph across all benchmarks");
     	
     	return render("chart", properties);
     	
@@ -167,7 +170,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	
     	StringBuffer graph = new StringBuffer("[\n['Cpus'"); 
     	
-    	Map<Integer, Map<BenchmarkJob, Double>> efficiencies = Maps.newLinkedHashMap();
+    	Map<Integer, Map<BenchmarkJob, Double>> efficiencies = new TreeMap<Integer, Map<BenchmarkJob,Double>>();
     	
     	for (BenchmarkJob bj : jobs) {
     		graph.append(",'"+bj.toString()+"'");
@@ -212,7 +215,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	
     	StringBuffer graph = new StringBuffer("[\n['Cpus'"); 
     	
-    	Map<Integer, Map<BenchmarkJob, Long>> times = Maps.newLinkedHashMap();
+    	Map<Integer, Map<BenchmarkJob, Long>> times = new TreeMap<Integer, Map<BenchmarkJob,Long>>();
     	
     	for (BenchmarkJob bj : jobs) {
     		graph.append(",'"+bj.toString()+"'");
@@ -224,7 +227,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     				temp = Maps.newLinkedHashMap();
     				times.put(cpus, temp);
     			}
-    			temp.put(bj, j.getTotalExecutionTime());
+   				temp.put(bj, j.getTotalExecutionTime());
     		}
     		
     	}
@@ -237,7 +240,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     		for ( BenchmarkJob bj : jobs ) {
     			Long time = times.get(cpus).get(bj);
     			String exectime = "null";
-    			if ( time != null && ! "0".equals(time) ) {
+    			if ( time != null && time > JobDetailsVO.THRESHOLD  ) {
     				exectime = time.toString();
     			}
     			row.append(","+exectime);
@@ -277,8 +280,16 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
 				int jobMinCpu=bJob.getMinCpus();
 				Long jobMinRuntime=bJob.getMinRunTime();
 				
-				double efficiency = (jobMinCpu * jobMinRuntime
-							.doubleValue()) / totalExecutionTime;
+//				double efficiency = (jobMinCpu * jobMinRuntime
+//							.doubleValue()) / totalExecutionTime;
+				
+				if ( totalExecutionTime <= JobDetailsVO.THRESHOLD ) {
+					totalExecutionTime = null;
+				}
+				if ( executionTime <= JobDetailsVO.THRESHOLD ) {
+					executionTime = null;
+				}
+
 
 				graph.append(",\n['" + cpus + "', "	+ executionTime + "," + totalExecutionTime + "]");
 

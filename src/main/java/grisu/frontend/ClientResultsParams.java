@@ -8,7 +8,7 @@ import com.beust.jcommander.Parameter;
 
 public class ClientResultsParams extends GrisuCliParameters {
 
-	@Parameter(names = {"-n", "--jobname"}, description = "the name for the job")
+	@Parameter(names = {"-n", "--jobnames"}, description = "comma-separated list of benchmark job names to include in the statistics generation")
 	private List<String> jobNames;
 
 	public List<String> getJobNames(){
@@ -27,9 +27,9 @@ public class ClientResultsParams extends GrisuCliParameters {
 		return list;
 	}
 
-	@Parameter(names = { "--graph"}, description = "specifies the type of graph (line or column) to be displayed for comparing the jobs in the jobnames list")
-	private String graph;
-	public String getGraph() {
-		return graph;
-	}
+//	@Parameter(names = { "--graph"}, description = "specifies the type of graph (line or column) to be displayed for comparing the jobs in the jobnames list")
+//	private String graph;
+//	public String getGraph() {
+//		return graph;
+//	}
 }
