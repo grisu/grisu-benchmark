@@ -394,7 +394,7 @@
 
 	</profiles>
 	<properties>
-		<grisu.version>0.5.10-SNAPSHOT</grisu.version>
+		<grisu.version>0.5.10</grisu.version>
 	</properties>
 
 
