@@ -1,6 +1,6 @@
 package grisu.frontend;
 
-import grisu.frontend.model.job.JobObject;
+import grisu.frontend.model.job.GrisuJob;
 
 import java.io.FileWriter;
 import java.io.IOException;

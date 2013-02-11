@@ -4,7 +4,7 @@ import grisu.control.ServiceInterface;
 import grisu.control.exceptions.JobPropertiesException;
 import grisu.control.exceptions.JobSubmissionException;
 import grisu.frontend.control.login.LoginManager;
-import grisu.frontend.model.job.JobObject;
+import grisu.frontend.model.job.GrisuJob;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.constants.Constants;
 import grisu.jcommons.utils.WalltimeUtils;
@@ -126,7 +126,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			}
 
 			System.out.println("Creating job...");
-			JobObject job = new JobObject(si);
+			GrisuJob job = new GrisuJob(si);
 
 			System.out.println("File to use for the job: " + script);
 
@@ -244,7 +244,7 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 		}
 	}
 
-	private String toFourDigits(Integer cpus) {
+	private static String toFourDigits(Integer cpus) {
 		String cpuStr = cpus.toString();
 		while (cpuStr.length() < 4) {
 			cpuStr = "0" + cpuStr;

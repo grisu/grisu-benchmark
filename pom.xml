@@ -112,6 +112,11 @@
 			<artifactId>velocity-tools</artifactId>
 			<version>2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>grisu.frontend</groupId>
+			<artifactId>gee</artifactId>
+			<version>0.3-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	
 	
@@ -410,7 +415,7 @@
 
 	</profiles>
 	<properties>
-		<grisu.version>0.5.10</grisu.version>
+		<grisu.version>0.5.18-SNAPSHOT</grisu.version>
 	</properties>
 
 

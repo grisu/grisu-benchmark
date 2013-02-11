@@ -5,7 +5,7 @@ import grisu.control.ServiceInterface;
 import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.events.JobCleanedEvent;
-import grisu.frontend.model.job.JobObject;
+import grisu.frontend.model.job.GrisuJob;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.utils.OutputHelpers;
 import grisu.model.GrisuRegistryManager;
@@ -107,7 +107,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 
 			table.add(titleRow);
 			
-			Map<String, Set<JobObject>> benchmarkMap = Maps.newTreeMap();
+			Map<String, Set<GrisuJob>> benchmarkMap = Maps.newTreeMap();
 			
 			for (String jobName : currentJobList) {
 				if (jobName.contains("_cpus_")) {
@@ -115,15 +115,15 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 					
 					String benchmarkName = jobName.substring(0, index - 5);
 
-					Set<JobObject> jobs = benchmarkMap.get(benchmarkName);
+					Set<GrisuJob> jobs = benchmarkMap.get(benchmarkName);
 					if ( jobs == null ) {
 						jobs = Sets.newTreeSet();
 						benchmarkMap.put(benchmarkName, jobs);
 					}
 
-					JobObject job;
+					GrisuJob job;
 					try {
-						job = new JobObject(si, jobName);
+						job = new GrisuJob(si, jobName);
 						
 						jobs.add(job);
 
@@ -141,7 +141,7 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 				int failed = 0;
 				int active = 0;
 				
-				for ( JobObject job : benchmarkMap.get(name) ) {
+				for ( GrisuJob job : benchmarkMap.get(name) ) {
 					
 					if (job.isFinished()) {
 						finished++;

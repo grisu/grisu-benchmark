@@ -1,22 +1,15 @@
 package grisu.frontend;
 
+import grisu.jcommons.view.html.VelocityUtils;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.apache.velocity.tools.generic.DisplayTool;
 
 import com.beust.jcommander.internal.Lists;
@@ -42,7 +35,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	JobDetailsVO baseline = BenchmarkJob.findBaselineJob(bJobs);
     	props.put("baseline", baseline);
     	
-    	String html = r.render("benchmark", props);
+    	String html = VelocityUtils.render("benchmark", props);
     	
     	try {
 			FileUtils.writeStringToFile(new File("./benchmark.html"), html);
@@ -75,7 +68,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	
     	props.put("renderer", r);	
     	
-    	String html = r.render("benchmark", props);
+    	String html = VelocityUtils.render("benchmark", props);
     	
     	
     	System.out.println(html);
@@ -94,7 +87,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	//properties.put("title", "Benchmark: "+bJob.toString());
     	properties.put("title", "");
     	
-    	return render("chart", properties);
+    	return VelocityUtils.render("chart", properties);
     	
     }
     
@@ -149,7 +142,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	properties.put("name", "combined");
     	properties.put("title", "Total compute time across all benchmarks");
     	
-    	return render("chart", properties);
+    	return VelocityUtils.render("chart", properties);
     	
     }
     
@@ -162,7 +155,7 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     	//properties.put("title", "Efficiency graph across all benchmarks (using baseline: "+baseline.getCpus()+" cpus, total execution time: "+baseline.getTotalExecutionTime()+")");
     	properties.put("title", "Efficiency graph across all benchmarks");
     	
-    	return render("chart", properties);
+    	return VelocityUtils.render("chart", properties);
     	
     }
     
@@ -302,52 +295,6 @@ public class VelocityHtmlRenderer implements BenchmarkRenderer {
     
 
 
-	/**
-	 * @param args
-	 */
-	public String render(String templateName, Map<String, Object> properties) {
 
-		try {
-			
-			
-			VelocityEngine ve = new VelocityEngine();
-            ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-            ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-
-            ve.init();
-
-            final String templatePath = templateName + ".vm";
-            InputStream input = this.getClass().getClassLoader().getResourceAsStream(templatePath);
-            if (input == null) {
-                throw new IOException("Template file doesn't exist");
-            }
-
-            InputStreamReader reader = new InputStreamReader(input);
-
-            VelocityContext context = new VelocityContext();
-            
-            
-            if (properties != null) {
-//                stringfyNulls(properties);
-                for (Map.Entry<String, Object> property : properties.entrySet()) {
-                    context.put(property.getKey(), property.getValue());
-                }
-            }
-
-            Template template = ve.getTemplate(templatePath, "UTF-8");
-            StringWriter writer = new StringWriter();
-
-            template.merge(context, writer);
-
-            return writer.toString();
-
-
-		} catch (Exception e) {
-			throw new RuntimeException("Could not create template string.", e);
-		}
-		
-		
-
-	}
 
 }

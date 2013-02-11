@@ -2,7 +2,7 @@ package grisu.frontend;
 
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.NoSuchJobException;
-import grisu.frontend.model.job.JobObject;
+import grisu.frontend.model.job.GrisuJob;
 import grisu.model.GrisuRegistryManager;
 import grisu.model.UserEnvironmentManager;
 
@@ -63,7 +63,7 @@ public class BenchmarkJob {
 	private String jobname;
 	private int minCpus;
 	private Long minRunTime;
-	// private Map<JobObject, Long> jobs = new HashMap<JobObject, Long>();
+	// private Map<GrisuJob, Long> jobs = new HashMap<GrisuJob, Long>();
 	// private Map<JobDetailsVO, Long> jobs = new HashMap<JobDetailsVO, Long>();
 	private List<JobDetailsVO> jobs = new ArrayList<JobDetailsVO>();
 	private List<String> jList = new ArrayList<String>();
@@ -152,7 +152,7 @@ public class BenchmarkJob {
 //					if (jname.contains(jobname)) {
 						System.out.println("Checking job: " + jname);
 						try {
-							JobObject job = new JobObject(si, jname);
+							GrisuJob job = new GrisuJob(si, jname);
 							if (!job.isFinished()) {
 								System.out.println("\tNot finished.");
 								if (!nowait) {
@@ -214,7 +214,7 @@ public class BenchmarkJob {
 	}
 
 	// Calculate the execution time for a job from the logs in benchmark.log
-	private static Long getExecutionTime(JobObject job) throws Exception {
+	private static Long getExecutionTime(GrisuJob job) throws Exception {
 		String jobLog = job.getFileContent("benchmark.log");
 		String holder = jobLog.substring(jobLog.lastIndexOf("Started:"));
 		Long long1 = Long.parseLong(holder.substring(9, holder.indexOf("\n")));
@@ -233,8 +233,8 @@ public class BenchmarkJob {
 	 * Comparator<JobDetailsVO>(){ public int compare(JobDetailsVO j1,
 	 * JobDetailsVO j2) { return (j1.getCpus()-j2.getCpus()); } });
 	 * 
-	 * Iterator<JobDetailsVO> it=jobSet.iterator(); //Map<JobObject, Long>
-	 * sortedMap=new LinkedHashMap<JobObject, Long>(); Map<JobDetailsVO, Long>
+	 * Iterator<JobDetailsVO> it=jobSet.iterator(); //Map<GrisuJob, Long>
+	 * sortedMap=new LinkedHashMap<GrisuJob, Long>(); Map<JobDetailsVO, Long>
 	 * sortedMap=new LinkedHashMap<JobDetailsVO, Long>(); JobDetailsVO jo;
 	 * while(it.hasNext()) { jo=it.next(); sortedMap.put(jo, jobs.get(jo)); }
 	 * return sortedMap; }
