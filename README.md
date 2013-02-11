@@ -53,7 +53,7 @@ First, we need to prepare a shell script that executes the job and writes out th
 
 Start and endtime need to be prepended by _Started:_ and _Finished:_, just copy the corresponding lines from the above job into your wrapper script.
 
-For this testjob we also need a textfile with some random content. Created that and name it _testfile.txt_.
+For this testjob we also need a textfile with some random content. Create that and name it _testfile.txt_.
 
 #### Submitting the benchmark
 
