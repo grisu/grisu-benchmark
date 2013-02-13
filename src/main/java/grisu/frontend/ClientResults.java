@@ -59,6 +59,19 @@ public class ClientResults extends GrisuCliClient<ClientResultsParams> {
 	@Override
 	public void run() {
 
+		try {
+			
+
+				getCredential();
+				getServiceInterface();
+			
+
+		} catch (Exception e) {
+			System.err.println("Error: " + e.getLocalizedMessage());
+			e.printStackTrace();
+			System.exit(2);
+		}
+		
 		List<String> jobnames = getCliParameters().getJobNames();
 
 		boolean nowait = getCliParameters().getNowait();

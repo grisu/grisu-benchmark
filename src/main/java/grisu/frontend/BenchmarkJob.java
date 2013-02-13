@@ -144,10 +144,12 @@ public class BenchmarkJob {
 					.getUserEnvironmentManager();
 			SortedSet<String> currentJobList = uem.getCurrentJobnames(true);
 
+			String rex = jobname+"_\\d\\d\\d\\d_cpus_.*";
+
 			while (jobsInProgress) {
 				jobsInProgress = false;
 				for (String jname : currentJobList) {
-					String rex = jobname+"_\\d\\d\\d\\d_cpus_.*";
+					
 					if (jname.matches(rex)) {
 //					if (jname.contains(jobname)) {
 						System.out.println("Checking job: " + jname);

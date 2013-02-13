@@ -1,18 +1,24 @@
 package grisu.frontend;
 
 import grisu.control.ServiceInterface;
-import grisu.control.exceptions.JobPropertiesException;
 import grisu.control.exceptions.JobSubmissionException;
 import grisu.frontend.control.login.LoginManager;
+import grisu.frontend.gee.GJob;
+import grisu.frontend.gee.Gee;
 import grisu.frontend.model.job.GrisuJob;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.constants.Constants;
-import grisu.jcommons.utils.WalltimeUtils;
-import grisu.model.FileManager;
+import grisu.jcommons.utils.PackageFileHelper;
+import grisu.jcommons.view.html.VelocityUtils;
 
-import java.util.List;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.ImmutableMap;
 
 public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 	
@@ -45,6 +51,9 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 
 	}
 
+	private GJob gjob;
+	private ServiceInterface si;
+	
 	public Client(GrisuBenchmarkParameters params, String[] args)
 			throws Exception {
 		super(params, args);
@@ -53,30 +62,26 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 	@Override
 	public void run() {
 
-		String script = getCliParameters().getScript();
+		String job_folder = getCliParameters().getJobFolder();
 
 		String cpu = getCliParameters().getCpu();
 		String group = getCliParameters().getGroup();
 		String queue = getCliParameters().getQueue();
-		String files = getCliParameters().getFiles();
-		List<String> envVarList = getCliParameters().getEnvVars();
+
 		String args = getCliParameters().getArgs();
 		String desc = getCliParameters().getDescription();
 		if (StringUtils.isBlank(desc) ) {
 			desc = NO_DESCRIPTION;
 		}
 
-		// merging older changes
-		String wallTime = getCliParameters().getWallTime();
-		String jobName = getCliParameters().getJobName();
-		Boolean mpi = getCliParameters().getMpi();
-//		Boolean single = getCliParameters().getSingle();
 
-		if (script == null) {
+		String jobName = getCliParameters().getJobName();
+
+		if (job_folder == null) {
 			System.err.println("Please specify the script name");
 			System.exit(1);
 		}
-		String scriptName = FileManager.getFilename(script);
+
 
 		if (group == null) {
 			System.err.println("Please specify a group name");
@@ -91,157 +96,142 @@ public class Client extends GrisuCliClient<GrisuBenchmarkParameters> {
 			System.exit(1);
 		}
 
-		if (StringUtils.isBlank(wallTime)) {
-			System.err.println("Please specify wall time");
-			System.exit(1);
-		}
-
 //		if (mpi && single) {
 //			System.err.println("Cannot set job type to both mpi and single");
 //			System.exit(1);
 //		}
+
 
 		if (queue == null) {
 			System.err.println("No queue specified.");
 			System.exit(1);
 		}
 
-		if (args == null)
+		if (args == null) {
 			args = "";
+		}
+		
+		Map<String, String> submitProperties = Maps.newHashMap();
+		submitProperties.put(Gee.GROUP_KEY, group);
+		submitProperties.put(Gee.QUEUE_KEY, queue);
+		submitProperties.put(Gee.JOBNAME_KEY, jobName);
+		
+		submitProperties.put(Constants.JOB_DESCRIPTION_KEY, desc);
+		
+		
+		try {
+			si = getServiceInterface();
+		} catch (Exception e) {
+			System.err.println("Could not login: "
+					+ e.getLocalizedMessage());
+			System.exit(1);
+		}
+		
+		gjob = new GJob(job_folder);
 
 		String[] cpuSplit = cpu.split(",");
 		String[] temp = new String[3];
-		String[] filename;// = FileManager.getFilename(file);
-		int index;
+
+		int startIndex = -1;
+		int endIndex = -1;
 		for (int i = 0; i < cpuSplit.length; i++) {
-			// all login stuff is implemented in the parent class
-			System.out.println("Getting serviceinterface...");
-			ServiceInterface si = null;
-			try {
-				si = getServiceInterface();
-			} catch (Exception e) {
-				System.err.println("Could not login: "
-						+ e.getLocalizedMessage());
-				System.exit(1);
-			}
 
 			System.out.println("Creating job...");
-			GrisuJob job = new GrisuJob(si);
-
-			System.out.println("File to use for the job: " + script);
-
-			job.setApplication(Constants.GENERIC_APPLICATION_NAME);
-			job.setCommandline("sh " + scriptName + " " + args);
+			Map<String, String> submitPropertiesThisOne = new HashMap(submitProperties);
 			
-			System.out.println("commandline:" + job.getCommandline());
-			job.addInputFileUrl(script);
-			if (files != null) {
-				filename = files.split(",");
-				for (int j = 0; j < filename.length; j++) {
-					job.addInputFileUrl(filename[j]);
-				}
-		//		job.setCommandline("cat "+filename[0]);
+			String whole_string = cpuSplit[i];
+			String walltime = null;
+			String hostCount = null;
+			// test for walltime
+			if ( whole_string.contains("[")) {
+				startIndex = whole_string.indexOf("[");
+				endIndex = whole_string.indexOf("]");
+				walltime = whole_string.substring(startIndex+1, endIndex);
+				whole_string = whole_string.substring(0, startIndex);
 			}
 			
-			try {
-				job.setWalltimeInSeconds(WalltimeUtils
-						.fromShortStringToSeconds(wallTime));
-			} catch (Exception e1) {
-				System.err.println("Can't parse walltime: " + wallTime);
-				System.exit(1);
+			// check whether this cpu has got a special hostcount
+			if (whole_string.contains("=")) {
+				startIndex = whole_string.indexOf("=");
+				hostCount = whole_string.substring(startIndex+1);
+				whole_string = whole_string.substring(0, startIndex);
 			}
-			if (mpi != null && mpi)
-				job.setForce_mpi(mpi);
-			else 
-				job.setForce_single(true);
-
-
-			System.out.println("jobtype: mpi-" + job.isForce_mpi() + " single-"
-					+ job.isForce_single());
-
-			job.setSubmissionLocation(queue);
 			
-			job.setDescription(desc);
+			String cpus = whole_string;
 
-			temp = cpuSplit[i].split("=");
-			String holder;
-			if (temp[0].contains("[")) {
-				index = temp[0].indexOf("[");
-				holder = temp[0].substring(index + 1, temp[0].length() - 1);
-				temp[0] = temp[0].substring(0, index);
-				try {
-					job.setWalltimeInSeconds(WalltimeUtils
-							.fromShortStringToSeconds(holder));
-				} catch (Exception e) {
-					System.err.println("Can't parse walltime: " + holder);
-					System.exit(1);
-				}
+			if ( StringUtils.isNotBlank(walltime) ) {
+				submitPropertiesThisOne.put(Constants.WALLTIME_IN_MINUTES_KEY, walltime);
 			}
-			job.setCpus(Integer.parseInt(temp[0]));
-			if (temp.length > 1) {
-				temp[0] = temp[1];
-				index = temp[0].indexOf("[");
-				if (index != -1) {
-					temp[1] = temp[0]
-							.substring(index + 1, temp[0].length() - 1);
-					temp[0] = temp[0].substring(0, index);
-					try {
-						job.setWalltimeInSeconds(WalltimeUtils
-								.fromShortStringToSeconds(temp[1]));
-					} catch (Exception e) {
-						System.out.println("Exception in WalltimeUtils.fromShortStringToSeconds: Cannot parse the string");
-					}
-				}
-				job.setHostCount(Integer.parseInt(temp[0]));
+			
+			if (StringUtils.isNotBlank(hostCount)) {
+				submitPropertiesThisOne.put(Constants.HOSTCOUNT_KEY, hostCount);
 			}
+			
+			submitPropertiesThisOne.put(Constants.NO_CPUS_KEY, cpus);
+			
+			submitPropertiesThisOne.put(Gee.JOBNAME_KEY, jobName+"_"+toFourDigits(Integer.parseInt(cpus))+"_cpus");
 
-			if (envVarList != null) {
-				temp = new String[3];
-				for (int k = 0; k < envVarList.size(); k++) {
-					temp[0] = envVarList.get(k);
-					index = temp[0].indexOf("=");
-					temp[1] = temp[0].substring(0, index);
-					temp[2] = temp[0].substring(index + 1, temp[0].length());
-					job.addEnvironmentVariable(temp[1], temp[2]);
-				}
-			}
+			System.out.println("Set jobname to be: " + submitPropertiesThisOne.get(Constants.JOBNAME_KEY));
 
-			job.setTimestampJobname(jobName + "_" + toFourDigits(job.getCpus())
-					+ "_cpus");
-			System.out.println("Set jobname to be: " + job.getJobname());
-
-			try {
-				System.out.println("Creating job on backend...");
-				job.createJob(group);
-			} catch (JobPropertiesException e) {
-				System.err.println("Could not create job: "
-						+ e.getLocalizedMessage());
-				System.exit(1);
-			}
-
-			try {
-				System.out.println("Submitting job to the grid...");
-				job.submitJob();
-			} catch (JobSubmissionException e) {
-				System.err.println("Could not submit job: "
-						+ e.getLocalizedMessage());
-				System.exit(1);
-			} catch (InterruptedException e) {
-				System.err.println("Jobsubmission interrupted: "
-						+ e.getLocalizedMessage());
-				System.exit(1);
-			}
-
-			System.out.println("Job submitted to queue: "
-					+ job.getJobProperty("queue"));
-			System.out.println("Job submission finished.");
-			System.out.println("Job submitted to: "
-					+ job.getJobProperty(Constants.SUBMISSION_SITE_KEY));
-
-			System.out.println("cpu-" + job.getCpus());
-			System.out.println("host-" + job.getHostCount());
-
+			
+			createAndSubmitJob(submitPropertiesThisOne);
 		}
+	}
+	
+	private void createAndSubmitJob(Map<String, String> properties) {
+
+		String command = properties.get(Constants.COMMANDLINE_KEY);
+		
+		if ( StringUtils.isBlank(command) ) {
+			
+			command = gjob.getProperties().get(Constants.COMMANDLINE_KEY);
+			
+			if ( StringUtils.isBlank(command)) {
+				throw new RuntimeException("No command specified");
+			}
+		}
+		
+
+		// create wrapper script
+		Map<String, Object> script_props = Maps.newHashMap();
+		script_props.put("command", command);
+		
+		String wrapper_content = VelocityUtils.render("wrapper_script", script_props);
+		File wrapper_script_file = PackageFileHelper.createTempFile(wrapper_content, "benchmark_wrapper_script.sh");
+		
+		properties.put(Constants.COMMANDLINE_KEY, "bash "+wrapper_script_file.getName());
+		
+		GrisuJob job = null;
+		try {
+			System.out.println("Creating job on backend...");
+			job = gjob.createJob(si, properties, wrapper_script_file);
+		} catch (Exception e) {
+			System.err.println("Could not create job: "
+					+ e.getLocalizedMessage());
+			System.exit(1);
+		}
+
+		try {
+			System.out.println("Submitting job to the grid...");
+			job.submitJob();
+		} catch (JobSubmissionException e) {
+			System.err.println("Could not submit job: "
+					+ e.getLocalizedMessage());
+			System.exit(1);
+		} catch (InterruptedException e) {
+			System.err.println("Jobsubmission interrupted: "
+					+ e.getLocalizedMessage());
+			System.exit(1);
+		}
+
+		System.out.println("Job submitted to queue: "
+				+ job.getJobProperty("queue"));
+		System.out.println("Job submission finished.");
+		System.out.println("Job submitted to: "
+				+ job.getJobProperty(Constants.SUBMISSION_SITE_KEY));
+
+		System.out.println("cpu-" + job.getCpus());
+		System.out.println("host-" + job.getHostCount());
 	}
 
 	private static String toFourDigits(Integer cpus) {
