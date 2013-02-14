@@ -1,0 +1,39 @@
+title               =  4a55new_loopall_p110a MD
+cpp                 =  /usr/bin/cpp
+constraints         =  all-bonds
+integrator          =  md
+dt                  =  0.002	; ps !
+;nsteps              =  1750000	; total 3.5 ns.
+nsteps              =  75000	
+tinit               =  0        ; ps !
+nstcomm             =  100
+nstxout             =  1000
+nstvout             =  1000
+nstfout             =  0
+nstlist             =  10
+ns_type             =  grid
+rlist = 0.9
+coulombtype = PME
+rcoulomb = 0.9
+rvdw = 1.4
+fourierspacing = 0.12
+fourier_nx = 0
+fourier_ny = 0
+fourier_nz = 0
+pme_order = 4
+ewald_rtol = 1e-5
+optimize_fft = yes
+; Berendsen temperature coupling is on in two groups
+Tcoupl              =  berendsen
+tau_t               =  0.1	     0.1
+tc-grps		    =  protein	     sol
+ref_t               =  300	     300
+; Pressure coupling is on
+Pcoupl              =  berendsen
+tau_p               =  0.5
+compressibility     =  4.5e-5
+ref_p               =  1.0
+; Generate velocites is off at 300 K.
+gen_vel             =  no
+gen_temp            =  300.0
+gen_seed            =  173529

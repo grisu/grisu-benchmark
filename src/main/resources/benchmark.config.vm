@@ -1,0 +1,6 @@
+job = ${job}
+cpus = ${cpus}
+group = ${group}
+queue = ${queue}
+jobname = ${jobname}
+description = ${desc}

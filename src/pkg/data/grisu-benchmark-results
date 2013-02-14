@@ -3,5 +3,5 @@
 unset DISPLAY
 export JAVA_OPTS="-Djava.awt.headless=true -Xms128m -Xmx128m"
 export X509_USER_PROXY=~/.grid/grid.proxy
-java ${JAVA_OPTS} -cp /usr/local/lib/grisu/grisu-benchmark-binary.jar grisu.frontend.ClientResults $@
+java ${JAVA_OPTS} -cp /usr/local/lib/grisu/grisu-benchmark-binary.jar grisu.frontend.benchmark.Results $@
 

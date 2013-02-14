@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Started: `date +%s`" >> benchmark.log
+
+${command}
+
+echo "Finished: `date +%s`" >> benchmark.log

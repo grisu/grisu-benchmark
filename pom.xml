@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>grisu.frontend</groupId>
+	<groupId>grisu.frontend.benchmark</groupId>
 	<artifactId>grisu-benchmark</artifactId>
 	<packaging>jar</packaging>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.3-SNAPSHOT</version>
 	<name>a grisu benchmark client</name>
 
 	<parent>
@@ -41,16 +41,9 @@
 		<!-- the main grisu dependency. -->
 		<!-- comment this and uncomment the 'grisu-client' dependency below if 
 			you don't need the swing dependencies -->
-		<dependency>
-			<groupId>grisu.frontend</groupId>
-			<artifactId>grisu-client-swing</artifactId>
-			<version>${grisu.version}</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
 
 		<!-- <dependency> -->
-		<!-- <groupId>grisu.frontend</groupId> -->
+		<!-- <groupId>grisu.frontend.benchmark</groupId> -->
 		<!-- <artifactId>grisu-client</artifactId> -->
 		<!-- <version>${grisu.version}</version> -->
 		<!-- <type>jar</type> -->
@@ -111,6 +104,11 @@
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity-tools</artifactId>
 			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>grisu.frontend</groupId>
+			<artifactId>grisu-client-swing</artifactId>
+			<version>${grisu.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>grisu.frontend</groupId>
@@ -183,7 +181,7 @@
 							<archive>
 								<index>true</index>
 								<manifest>
-									<mainClass>grisu.frontend.Client</mainClass>
+									<mainClass>grisu.frontend.benchmark.Submit</mainClass>
 								</manifest>
 								<manifestEntries>
 									<Class-Path>bcprov.jar local-backend-dev.jar local-backend.jar</Class-Path>
@@ -327,6 +325,17 @@
 												<filemode>755</filemode>
 											</mapper>
 										</data>
+										<data>
+											<src>${project.basedir}/src/pkg/data/grisu-benchmark-create</src>
+											<type>file</type>
+											<mapper>
+												<type>perm</type>
+												<prefix>/usr/bin/</prefix>
+												<user>root</user>
+												<group>root</group>
+												<filemode>755</filemode>
+											</mapper>
+										</data>
 
 									</dataSet>
 
@@ -390,6 +399,9 @@
 										<source>
 											<location>src/pkg/data/grisu-benchmark-submit</location>
 										</source>
+										<source>
+											<location>src/pkg/data/grisu-benchmark-create</location>
+										</source>										
 									</sources>
 								</mapping>
 

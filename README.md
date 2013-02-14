@@ -22,9 +22,9 @@ Download / Install
 If you are using the jar file, you can start _grisu-benchmark_ like this:
 
     # to submit & start a benchmark
-    java -cp grisu-benchmark-binary.jar grisu.frontend.Client
+    java -cp grisu-benchmark-binary.jar grisu.frontend.benchmark.Submit
     # to get the benchmark results
-    java -cp grisu-benchmark-binary.jar grisu.frontend.ClientResults
+    java -cp grisu-benchmark-binary.jar grisu.frontend.benchmark.Results
     
     
 If you installed either the deb or rpm package, you can start it via:
