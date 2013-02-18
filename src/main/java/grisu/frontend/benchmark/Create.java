@@ -131,9 +131,9 @@ public class Create extends GrisuCliClient<GrisuBenchmarkCreateParameters> {
 
 		if (StringUtils.isBlank(job_folder)) {
 			
-			File benchmark_job_folder = new File(application_folder.getAbsolutePath()+File.separator+app+File.separator+Submit.BENCHMARKS_FOLDER_NAME+File.separator+benchmarkName);
+			File benchmark_job_folder = new File(application_folder.getAbsolutePath()+File.separator+app+File.separator+Gee.JOBS_DIR_NAME+File.separator+benchmarkName);
 			if ( ! benchmark_job_folder.exists() ) {
-				benchmark_job_folder.mkdirs();
+				System.out.println("Creating job: "+benchmark_job_folder.getAbsolutePath());
 				GJob.createJobStub(benchmark_job_folder, benchmarkName);
 			} else {
 				System.out.println("Job with name '"+benchmarkName+"' already exists for package '"+app+"', not creating new one.");
@@ -155,6 +155,7 @@ public class Create extends GrisuCliClient<GrisuBenchmarkCreateParameters> {
 		
 		try {
 			FileUtils.writeStringToFile(benchmark_config_file, content);
+			System.out.println("Wrote benchmark config: "+benchmark_config_file.getAbsolutePath());
 		} catch (Exception e) {
 			System.err.println("Can't write to file '"+benchmark_config_file.getAbsolutePath()+"': "+e.getLocalizedMessage());
 		}
