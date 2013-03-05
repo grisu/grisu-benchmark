@@ -3,7 +3,7 @@
 	<groupId>grisu.frontend</groupId>
 	<artifactId>grisu-benchmark</artifactId>
 	<packaging>jar</packaging>
-	<version>0.5-SNAPSHOT</version>
+	<version>0.5</version>
 	<name>a grisu benchmark client</name>
 
 	<parent>
@@ -33,7 +33,7 @@
 		<connection>scm:git:git://github.com/grisu/grisu-benchmark.git</connection>
 		<developerConnection>scm:git:git@github.com:grisu/grisu-benchmark.git</developerConnection>
 		<url>https://github.com/grisu/grisu-benchmark</url>
-    <tag>HEAD</tag>
+    <tag>0.5</tag>
   </scm>
 
 	<dependencies>
