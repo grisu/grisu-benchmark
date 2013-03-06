@@ -3,7 +3,7 @@
 	<groupId>grisu.frontend</groupId>
 	<artifactId>grisu-benchmark</artifactId>
 	<packaging>jar</packaging>
-	<version>0.4-SNAPSHOT</version>
+	<version>0.11-SNAPSHOT</version>
 	<name>a grisu benchmark client</name>
 
 	<parent>
@@ -427,7 +427,7 @@
 
 	</profiles>
 	<properties>
-		<grisu.version>0.6-SNAPSHOT</grisu.version>
+		<grisu.version>0.6</grisu.version>
 	</properties>
 
 
