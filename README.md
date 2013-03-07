@@ -14,8 +14,8 @@ Download / Install
  * Java 6
 
 ### Downloads
- * executable jar file: [here](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark-binary.jar)
- * linux packages: [deb](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark.deb) and [rpm](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark.rpm)
+ * executable jar file: [here](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark/grisu-benchmark-binary.jar)
+ * linux packages: [deb](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark/grisu-benchmark.deb) and [rpm](http://code.ceres.auckland.ac.nz/stable-downloads/grisu-benchmark/grisu-benchmark.rpm)
 
 ### Usage
 
