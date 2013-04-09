@@ -427,7 +427,7 @@
 
 	</profiles>
 	<properties>
-		<grisu.version>0.6</grisu.version>
+		<grisu.version>0.6.2-SNAPSHOT</grisu.version>
 	</properties>
 
 
