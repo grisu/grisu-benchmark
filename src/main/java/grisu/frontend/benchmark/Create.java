@@ -1,19 +1,18 @@
 package grisu.frontend.benchmark;
 
+import com.google.common.collect.Maps;
+import grisu.frontend.control.GJob;
 import grisu.frontend.control.login.LoginManager;
-import grisu.frontend.gee.GJob;
 import grisu.frontend.gee.Gee;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.constants.Constants;
 import grisu.jcommons.view.html.VelocityUtils;
-
-import java.io.File;
-import java.util.Map;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 public class Create extends GrisuCliClient<GrisuBenchmarkCreateParameters> {
 
@@ -131,11 +130,15 @@ public class Create extends GrisuCliClient<GrisuBenchmarkCreateParameters> {
 
 		if (StringUtils.isBlank(job_folder)) {
 			
-			File benchmark_job_folder = new File(application_folder.getAbsolutePath()+File.separator+app+File.separator+Gee.JOBS_DIR_NAME+File.separator+benchmarkName);
+			File benchmark_job_folder = new File(application_folder.getAbsolutePath()+File.separator+app+File.separator+ Gee.JOBS_DIR_NAME+File.separator+benchmarkName);
 			if ( ! benchmark_job_folder.exists() ) {
 				System.out.println("Creating job: "+benchmark_job_folder.getAbsolutePath());
-				GJob.createJobStub(benchmark_job_folder, benchmarkName);
-			} else {
+                try {
+                    GJobUtils.createJobStub(benchmark_job_folder, benchmarkName);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
 				System.out.println("Job with name '"+benchmarkName+"' already exists for package '"+app+"', not creating new one.");
 			}
 			job_folder = "../../"+Gee.JOBS_DIR_NAME+"/"+benchmark_job_folder.getName()+"/"+GJob.JOB_PROPERTIES_FILE_NAME;

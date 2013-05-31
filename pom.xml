@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>nz.org.nesi</groupId>
 		<artifactId>nesi</artifactId>
-		<version>0.23</version>
+		<version>1.0</version>
 	</parent>
 
 	<repositories>
@@ -113,7 +113,7 @@
 		<dependency>
 			<groupId>grisu.frontend</groupId>
 			<artifactId>gee</artifactId>
-			<version>0.3</version>
+			<version>0.11</version>
 		</dependency>
 	</dependencies>
 	
@@ -427,7 +427,7 @@
 
 	</profiles>
 	<properties>
-		<grisu.version>0.6.2</grisu.version>
+		<grisu.version>0.7</grisu.version>
 	</properties>
 
 

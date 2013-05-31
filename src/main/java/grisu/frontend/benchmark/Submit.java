@@ -1,24 +1,21 @@
 package grisu.frontend.benchmark;
 
+import com.beust.jcommander.internal.Maps;
 import grisu.control.ServiceInterface;
+import grisu.control.exceptions.JobPropertiesException;
 import grisu.control.exceptions.JobSubmissionException;
+import grisu.frontend.control.GJob;
 import grisu.frontend.control.login.LoginManager;
-import grisu.frontend.gee.GJob;
 import grisu.frontend.gee.Gee;
 import grisu.frontend.model.job.GrisuJob;
 import grisu.frontend.view.cli.GrisuCliClient;
 import grisu.jcommons.constants.Constants;
-import grisu.jcommons.utils.PackageFileHelper;
-import grisu.jcommons.view.html.VelocityUtils;
+import grisu.model.job.JobDescription;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.beust.jcommander.internal.Maps;
-import com.google.common.collect.ImmutableMap;
 
 public class Submit extends GrisuCliClient<GrisuBenchmarkSubmitParameters> {
 	
@@ -233,10 +230,17 @@ public class Submit extends GrisuCliClient<GrisuBenchmarkSubmitParameters> {
 	private void createAndSubmitJob(Map<String, String> properties) {
 
 		String command = properties.get(Constants.COMMANDLINE_KEY);
-		
-		if ( StringUtils.isBlank(command) ) {
+
+        JobDescription desc = null;
+        try {
+            desc = gjob.createJobDescription(si);
+        } catch (JobPropertiesException e) {
+            throw new RuntimeException("Can't create jobdescription: "+e.getLocalizedMessage());
+        }
+
+        if ( StringUtils.isBlank(command) ) {
 			
-			command = gjob.getProperties().get(Constants.COMMANDLINE_KEY);
+			command = desc.getCommandline();
 			
 			if ( StringUtils.isBlank(command)) {
 				throw new RuntimeException("No command specified");
@@ -251,8 +255,12 @@ public class Submit extends GrisuCliClient<GrisuBenchmarkSubmitParameters> {
 				group = properties.get(Constants.FQAN_KEY);
 			}
 
-			job = gjob.createJob(si, properties, false);
-			
+            Map<String, String> finalProperties = desc.getStringJobSubmissionPropertyMap();
+            finalProperties.putAll(properties);
+
+
+            job = new GrisuJob(si, finalProperties);
+
 			job.addEnvironmentVariable("PROLOG", "echo \"Started: `date +%s`\" >> benchmark.log");
 			job.addEnvironmentVariable("EPILOG", "echo \"Finished: `date +%s`\" >> benchmark.log");
 			
