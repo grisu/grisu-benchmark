@@ -39,7 +39,7 @@
 	<dependencies>
 
 		<!-- the main grisu dependency. -->
-		<!-- comment this and uncomment the 'grisu-client' dependency below if 
+		<!-- comment this and uncomment the 'grisu-client' dependency below if
 			you don't need the swing dependencies -->
 
 		<!-- <dependency> -->
@@ -50,10 +50,10 @@
 		<!-- <scope>compile</scope> -->
 		<!-- </dependency> -->
 
-		<!-- we can't include the bouncy castle library in our assembled binary 
-			so it has to put in the classpath in some other way. You could either have 
-			the bcprov jar in the same directory as your executable jar, or you just 
-			do nothing. Grisu will try to download it in the background and put it in 
+		<!-- we can't include the bouncy castle library in our assembled binary
+			so it has to put in the classpath in some other way. You could either have
+			the bcprov jar in the same directory as your executable jar, or you just
+			do nothing. Grisu will try to download it in the background and put it in
 			the classpath once your application is executed the first time... -->
 		<dependency>
 			<groupId>bouncycastle</groupId>
@@ -63,12 +63,12 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- further grisu dependencies, incuded by default but can be enabled/disabled 
+		<!-- further grisu dependencies, incuded by default but can be enabled/disabled
 			if not needed and you want a smaller assembly -->
-		<!-- the grisu-core dependency is needed when you want to connect to a 
+		<!-- the grisu-core dependency is needed when you want to connect to a
 			local backend (which is the only supported backend for grisu 0.3 at the moment -->
-		<!-- <dependency> <groupId>grisu.backend</groupId> <artifactId>grisu-core</artifactId> 
-			<version>${grisu.version}</version> <type>jar</type> <scope>compile</scope> 
+		<!-- <dependency> <groupId>grisu.backend</groupId> <artifactId>grisu-core</artifactId>
+			<version>${grisu.version}</version> <type>jar</type> <scope>compile</scope>
 			</dependency> -->
 
 
@@ -116,13 +116,13 @@
 			<version>0.11</version>
 		</dependency>
 	</dependencies>
-	
-	
+
+
 
 	<build>
 
 		<plugins>
-		
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
@@ -135,7 +135,7 @@
 					<tagNameFormat>@{project.version}</tagNameFormat>
 					<releaseProfiles>deb,rpm</releaseProfiles>
 				</configuration>
-			</plugin>		
+			</plugin>
 
 			<!-- replace version in file -->
 			<plugin>
@@ -165,7 +165,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- you can disable the assembly plugin if you want, your builds will 
+			<!-- you can disable the assembly plugin if you want, your builds will
 				be faster I find it quite handy to have maven build an executable jar, though -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -401,7 +401,7 @@
 										</source>
 										<source>
 											<location>src/pkg/data/grisu-benchmark-create</location>
-										</source>										
+										</source>
 									</sources>
 								</mapping>
 
@@ -413,9 +413,9 @@
 							<preinstallScriptlet>
 								<script>echo "Installing grisu-benchmark..."</script>
 							</preinstallScriptlet>
-							<!-- <postinstallScriptlet> <scriptFile>src/main/scripts/postinstall</scriptFile> 
-								<fileEncoding>utf-8</fileEncoding> </postinstallScriptlet> <preremoveScriptlet> 
-								<scriptFile>src/main/scripts/preremove</scriptFile> <fileEncoding>utf-8</fileEncoding> 
+							<!-- <postinstallScriptlet> <scriptFile>src/main/scripts/postinstall</scriptFile>
+								<fileEncoding>utf-8</fileEncoding> </postinstallScriptlet> <preremoveScriptlet>
+								<scriptFile>src/main/scripts/preremove</scriptFile> <fileEncoding>utf-8</fileEncoding>
 								</preremoveScriptlet> -->
 						</configuration>
 					</plugin>
@@ -427,7 +427,7 @@
 
 	</profiles>
 	<properties>
-		<grisu.version>0.7</grisu.version>
+		<grisu.version>0.7.9</grisu.version>
 	</properties>
 
 
